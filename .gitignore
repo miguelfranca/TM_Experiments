@@ -8,7 +8,6 @@
 #other
 */bin/
 bin/
-*/SFML_AI_Pendulum_Balancing/
 SFML_AI_Pendulum_Balancing/
 
 *.exe
