@@ -1,0 +1,15 @@
+#files without extension
+*
+!/**/
+!*.*
+!*Makefile
+!*run
+
+#other
+*/bin/
+bin/
+*.exe
+*.o
+
+*.DS_Store
+.fuse_hidden*

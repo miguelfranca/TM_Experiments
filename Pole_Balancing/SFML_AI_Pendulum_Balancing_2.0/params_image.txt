@@ -1,0 +1,24 @@
+
+///////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////// IMAGE PARAMETERS //////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////
+
+//GA parameters for image (all others are generally not needed)
+populationSize 				= 100
+eliteCount 					= 5 	//default = 0
+crossoverProb 				= 0.2 	//default = 1.
+mutateProb 					= 0.5 	//default = 0.1
+maxGenerations 				= 2000
+
+//image margin
+//margin 					= 0.03 	//default = 0.03
+
+//maximum shift when doing mutations over nodes' positions
+//maxMutation 				= 0.1 	//default = 0.1
+
+//energy function parameters
+//connectionAttractionPower = 2. 	//default = 2.
+//nodeRepulsionPower 		= -1. 	//default = -1.
+//nodeRepulsionCoeff 		= 6./4. //default = 6./4.
+
+///////////////////////////////////////////////////////////////////////////////////////////////
