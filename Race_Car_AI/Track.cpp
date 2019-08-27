@@ -5,11 +5,14 @@ Track::Track(sf::RenderTarget* renderer) : GF::Widget(renderer)
 { 
 	if (!track.create(SCREENWIDTH, SCREENHEIGHT))
 		exit(1);
+
 	track.clear(sf::Color::Transparent);
 
 	image.create(SCREENWIDTH, SCREENHEIGHT);
 
 	checkpoints.push_back(0);
+
+	sprite = new sf::Sprite(track.getTexture());
 }
 
 Track::~Track() 
@@ -17,23 +20,25 @@ Track::~Track()
 	for (auto& circle : circles)
 		delete circle;
 	circles.clear();
+	if(sprite) delete sprite;
 }
 
 bool Track::draw()
 {
-	sf::Sprite sprite = flipImage();
-	m_target->draw(sprite);
+	m_target->draw(*sprite);
 	return true;
 }
 
-void Track::addCircle(sf::Vector2f pos)
+void Track::addCircle(sf::Vector2f pos, int index)
 {
-	GF::Circle* circle  = new GF::Circle(TRACK_RADIUS, pos, GRAY);
-	circles.push_back(circle);
-	track.draw(*circle);
+	if(index == -1){
+		GF::Circle* circle  = new GF::Circle(TRACK_RADIUS, pos, GRAY);
+		circles.push_back(circle);
+		track.draw(*circle);
+	}
 
 	if(dist(pos, circles[checkpoints.back()]->getPosition()) >= 100.)
-		checkpoints.push_back(circles.size() - 1);
+		checkpoints.push_back(index == -1 ? (circles.size() - 1) : index);
 }
 
 bool Track::handleEvent(GF::Event &event)
@@ -48,8 +53,12 @@ bool Track::handleEvent(GF::Event &event)
 		circles.erase(end, circles.end());
 
 		track.clear(sf::Color::Transparent);
-		for(auto& circle : circles)
-			track.draw(*circle);
+		checkpoints.clear();
+		checkpoints.push_back(0);
+		for(unsigned i = 0; i < circles.size(); i++){
+			addCircle(circles[i]->getPosition(), i);
+			track.draw(*circles[i]);
+		}
 	}
 
 	if(GF::Mouse::Left.released(event) || GF::Mouse::Right.released(event))
@@ -59,22 +68,24 @@ bool Track::handleEvent(GF::Event &event)
 }
 
 bool Track::isAtCheckpoint(int obj_checkpoint, sf::Vector2f pos) 
-	{
-		if(circles.size() == 0) return false;
-		obj_checkpoint %= checkpoints.size();
-		// if(obj_checkpoint >= (int)circles.size()) return false;
-		if(obj_checkpoint >= (int)checkpoints.size()) return false;
-
-		if(pos.y < 0 || pos.y > SCREENHEIGHT || pos.x > SCREENWIDTH || pos.x < 0 ) return false;
-
-		return circles[checkpoints[obj_checkpoint]]->contains(pos); 
-	}
-
-
-sf::Sprite Track::flipImage()
 {
-	sf::Sprite sprite(track.getTexture());
-	sprite.setScale(1.0, -1.0);
-	sprite.setPosition(0.0, sprite.getTextureRect().height);
-	return sprite;
+	if(circles.size() == 0) return false;
+	obj_checkpoint %= checkpoints.size();
+		// if(obj_checkpoint >= (int)circles.size()) return false;
+	if(obj_checkpoint >= (int)checkpoints.size()) return false;
+
+	if(pos.y < 0 || pos.y > SCREENHEIGHT || pos.x > SCREENWIDTH || pos.x < 0 ) return false;
+
+	// std::cout << "Checkpoint + 1: " << circles[checkpoints[obj_checkpoint]]->contains(pos) << std::endl;
+
+	return circles[checkpoints[obj_checkpoint]]->contains(pos); 
+}
+
+
+void Track::saveAndFlip()
+{
+	if(sprite) delete sprite;
+	sprite = new sf::Sprite(track.getTexture());
+	sprite->setScale(1.0, -1.0);
+	sprite->setPosition(0.0, sprite->getTextureRect().height);
 }

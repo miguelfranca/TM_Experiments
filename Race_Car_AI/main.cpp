@@ -1,8 +1,8 @@
-﻿#include "MyGame.h"
+﻿#include "CarAI.h"
 
 int main() {
 
-	MyGame gg;
+	CarAI gg;
 	gg.showFPS(true);
 	gg.setMaxFPS(240);
 	gg.run();

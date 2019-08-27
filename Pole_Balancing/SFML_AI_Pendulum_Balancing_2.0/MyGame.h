@@ -14,7 +14,7 @@ class MyGame : public GF::Game {
 public:
 
 	MyGame() : image(nullptr), AI_Active(sf::Vector2f(0, 50)), time(sf::Vector2f(0, 200)), generation(sf::Vector2f(0, 100)),
-				population(sf::Vector2f(0, 150)), fitness(sf::Vector2f(0, 250))
+	population(sf::Vector2f(0, 150)), fitness(sf::Vector2f(0, 250))
 	{ this->pop = nullptr;}
 
 	void updatePopulation(const Population<NEAT::Network>* pop, unsigned n = 1) { 
@@ -43,7 +43,7 @@ public:
 		unsigned n = std::min(N, tot);
 
 		unsigned iter = 0;
-		while(n>pop->species.size()){
+		while(n > pop->species.size()){
 			for(unsigned i=0; i<pop->species.size(); ++i){
 				if(pop->species[i]->bestRank == iter) continue;
 				if(pop->species[i]->pop.size() <= iter) continue;
@@ -75,7 +75,8 @@ public:
 	// first thing to be called every frame
 	bool onHandleEvent(GF::Event& event) override
 	{
-		image->handleEvent();
+		if(game_state == 0) 
+			image->handleEvent();
 
 		static GF::ToggleKey E (sf::Keyboard::E);
 		if(E.isKeyPressed()){ 
@@ -175,6 +176,8 @@ public:
 			window.draw(generation);
 			window.draw(population);
 			window.draw(fitness);
+
+			window.draw(network_im);
 		}
 
 		if(game_state == 3)
@@ -195,7 +198,6 @@ public:
 			TOPLEFT_F + sf::Vector2f(1325, 30),
 			15);
 		window.draw(text);
-
 		window.draw(network_im);
 
 		return true;

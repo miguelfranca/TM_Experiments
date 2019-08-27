@@ -26,22 +26,28 @@ public:
 	bool draw() override;
 
 	bool isClicked();
+	void steer_gas(float x, float y);
+
+	inline int getCheckpoint() const { return current_checkpoint; }
+
+	std::vector<double> getSensors();
+	void reset();
+
+	double t;
+	bool alive;
 
 private:
 	
 	void setup(float x, float y, float size_x, float size_y, std::string image = "");
 	void setup(float x, float y, float size_x, float size_y, const sf::Texture& texture);
 
-	void steer_gas(float x, float y);
 	void boost();
 	void drive(const float fElapsedTime);
-	void stop();
 
 	void setImage(float size_x, float size_y, std::string image_path);
 	void setImage(float size_x, float size_y, const sf::Texture& texture);
 
 	void updateSensors();
-	// std::vector<double> getSensors();
 
 	void showSensors(bool b);
 

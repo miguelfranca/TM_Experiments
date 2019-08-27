@@ -21,41 +21,29 @@ Car::Car(sf::RenderTarget* renderer, float x, float y, float size_x, float size_
 	this->track = track;
 	m_target = renderer;
 	setup(x, y, size_x, size_y, image);
-	// speed = 0;
-	// turn = 0;
-	show_sensors = true;
 }
 
 Car::Car(sf::RenderTarget* renderer, sf::Vector2f pos, float size_x, float size_y, Track* track, std::string image) {
 	this->track = track;
 	m_target = renderer;
 	setup(pos.x, pos.y, size_x, size_y, image);
-	// speed = 0;
-	// turn = 0;
-	show_sensors = true;
-
-	current_checkpoint = -1;
 }
 
 Car::Car(sf::RenderTarget* renderer, float x, float y, float size_x, float size_y, Track* track, const sf::Texture& texture) {
 	this->track = track;
 	m_target = renderer;
 	setup(x, y, size_x, size_y, texture);
-	// speed = 0;
-	// turn = 0;
-	show_sensors = true;
 }
 
 Car::Car(sf::RenderTarget* renderer, sf::Vector2f pos, float size_x, float size_y, Track* track, const sf::Texture& texture) {
 	this->track = track;
 	m_target = renderer;
 	setup(pos.x, pos.y, size_x, size_y, texture);
-	// speed = 0;
-	// turn = 0;
-	show_sensors = true;
 }
 
 void Car::setup(float x, float y, float size_x, float size_y, std::string image) {
+	reset();
+	show_sensors = true;
 	setPosition(x, y);
 	if (image != "")
 		setImage(size_x, size_y, image);
@@ -63,6 +51,8 @@ void Car::setup(float x, float y, float size_x, float size_y, std::string image)
 }
 
 void Car::setup(float x, float y, float size_x, float size_y, const sf::Texture & texture) {
+	reset();
+	show_sensors = true;
 	setPosition(x, y);
 	setImage(size_x, size_y, texture);
 	setOrigin(size_x / 2.f / getScale().x, size_y / 2.f / getScale().y);
@@ -131,6 +121,9 @@ void Car::steer_gas(float I_f, float I_s){
 
 bool Car::update(const float fElapsedTime, const float fTotalTime)
 {
+	if(track->isAtCheckpoint(current_checkpoint + 1, getPosition()))
+		current_checkpoint++;
+
 	drive(fElapsedTime);
 	updateSensors();
 	return true;
@@ -153,12 +146,6 @@ bool Car::draw()
 	// DRAWS THE SPRITE OF THE CAR
 
 	m_target->draw(*this);
-
-	if(track->isAtCheckpoint(current_checkpoint + 1, getPosition()))
-		current_checkpoint++;
-
-	std::cout << current_checkpoint << std::endl;
-
 	return true;
 }
 
@@ -176,16 +163,29 @@ void Car::boost() {
 	vx += vx;
 }
 
-void Car::stop() {
+void Car::reset() {
 	vx = 0;
 	vy = 0;
 	// speed = 0;
 	ax = 0;
 	ay = 0;
 	steer_rate = 0;
+
+	current_checkpoint = -1;
+	sensors.clear();
+
+	t = 0.;
+	alive = true;
 }
 
 void Car::drive(const float fElapsedTime) {
+
+	double angle = steer_rate * fElapsedTime;
+	rotate(angle);
+
+	vx += ax * fElapsedTime;
+	vy += ay * fElapsedTime;
+	this->move(vx * fElapsedTime, vy * fElapsedTime);
 
 	if (getPosition().x > SCREENWIDTH)
 		setPosition(0, getPosition().y);
@@ -195,37 +195,42 @@ void Car::drive(const float fElapsedTime) {
 		setPosition(getPosition().x, 0);
 	if (getPosition().y < 0)
 		setPosition(getPosition().x, SCREENHEIGHT);
+}
 
-	double angle = steer_rate * fElapsedTime;
-	rotate(angle);
-
-	vx += ax * fElapsedTime;
-	vy += ay * fElapsedTime;
-	this->move(vx * fElapsedTime, vy * fElapsedTime);
+sf::Vector2f flipY(sf::Vector2f&& vec){
+	vec.y = SCREENHEIGHT - vec.y;
+	return vec;
+}
+sf::Vector2f flipVecY(sf::Vector2f&& vec){
+	vec.y = - vec.y;
+	return vec;
 }
 
 void Car::updateSensors() {
-	sf::Image image = track->getTrack();
-	image.flipVertically();
+	sf::Image &image = track->getTrack();
+	// image.flipVertically();
 	sensors.clear();
+
+	sf::Vector2f pos = getPosition();
+	flipY((sf::Vector2f&&)pos);
+
 	//y = vec.y / vec.x * x	checks points to see if its color is !gray, if this happens then it is a boundary
-	sensors.push_back(checkForColor(image, vector_rotator_matrix(-CAR_SENSORS_DIST, 0, getRotation()), getPosition()));
-	sensors.push_back(checkForColor(image, vector_rotator_matrix(CAR_SENSORS_DIST, 0, getRotation()), getPosition()));
-	sensors.push_back(checkForColor(image, vector_rotator_matrix(0, -CAR_SENSORS_DIST, getRotation()), getPosition()));
-	sensors.push_back(checkForColor(image, vector_rotator_matrix(0, CAR_SENSORS_DIST, getRotation()), getPosition()));
-	sensors.push_back(checkForColor(image, vector_rotator_matrix(-CAR_SENSORS_DIST, -CAR_SENSORS_DIST, getRotation()), getPosition()));
-	sensors.push_back(checkForColor(image, vector_rotator_matrix(CAR_SENSORS_DIST, -CAR_SENSORS_DIST, getRotation()), getPosition()));
+	// sensors.push_back(flipY(checkForColor(image, flipVecY(vector_rotator_matrix(-CAR_SENSORS_DIST, 0, getRotation())), pos)));
+	// sensors.push_back(flipY(checkForColor(image, flipVecY(vector_rotator_matrix(CAR_SENSORS_DIST, 0, getRotation())), pos)));
+	sensors.push_back(flipY(checkForColor(image, flipVecY(vector_rotator_matrix(0, -CAR_SENSORS_DIST, getRotation())), pos)));
+	sensors.push_back(flipY(checkForColor(image, flipVecY(vector_rotator_matrix(0, CAR_SENSORS_DIST, getRotation())), pos)));
+	sensors.push_back(flipY(checkForColor(image, flipVecY(vector_rotator_matrix(-CAR_SENSORS_DIST, -CAR_SENSORS_DIST, getRotation())), pos)));
+	sensors.push_back(flipY(checkForColor(image, flipVecY(vector_rotator_matrix(CAR_SENSORS_DIST, -CAR_SENSORS_DIST, getRotation())), pos)));
 }
 
-// std::vector<double> Car::getSensors() {
-// 	std::vector<double> s;
-// 	For2(i, sensors.size()) {
-// 		s.push_back(dist(getPosition(), sensors[i]));
-// 	}
-// 	return s;
-// }
+std::vector<double> Car::getSensors() {
+	std::vector<double> s;
+	For2(i, sensors.size())
+		s.push_back(dist(getPosition(), sensors[i]));
+	return s;
+}
 
-sf::Vector2f checkForColor(sf::Image & image, sf::Vector2f vec, sf::Vector2f position) {
+sf::Vector2f checkForColor(sf::Image &image, sf::Vector2f vec, sf::Vector2f position) {
 	float a = 2;
 	sf::Color color = image.getPixel(position.x, position.y);
 	if (vec.x != 0) {
