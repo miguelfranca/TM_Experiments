@@ -2,6 +2,7 @@
 #include <vector>
 #include "Game_Framework/holders.h"
 #include "Game_Framework/sfml.h"
+#include "Game_Framework/GUI.h"
 #include "Game_Framework/Global.h"
 #include "Utility.h"
 #include <vector>
@@ -39,10 +40,16 @@ public:
 
 	void saveAndFlip();
 
+	bool isOverButton();
+
+	void save(const std::string &filename) const ;
+
 private:
 	std::vector<GF::Circle*> circles;
 	std::vector<int> checkpoints;
 	sf::RenderTexture track;
 	sf::Image image;
 	sf::Sprite* sprite;
+	GF::Button<GF::Rectangle> show_button;
+	bool show;
 };

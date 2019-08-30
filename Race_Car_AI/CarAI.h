@@ -18,6 +18,8 @@
 #define LAPS 3.
 #define TIME_BETWEEN_CHECKPOINTS 3. // seg
 
+#define INPUT_FACTOR 4.
+#define DRAW_SIZE 50
 
 class CarEvolver : public NEAT::Evolver {
 public:
@@ -48,7 +50,7 @@ static double fitnessFunc (const NEAT::Network& net, const GA::Evolver<NEAT::Net
 		car.t += dt;
 		inputs = car.getSensors();
 
-		inputs /= SCREENWIDTH;
+		inputs *= INPUT_FACTOR/SCREENWIDTH;
 		VecD outputs = net.evaluate(VecD(inputs));
 
 		car.steer_gas(outputs[0] * 2. - 1., outputs[1] * 2. - 1.);
@@ -95,6 +97,7 @@ private:
 	GA::StopReason stop;
 	NEAT::Image* image;
 	sf::Sprite network_im;
+	double lastFitness;
 
 	bool drawing;
 	bool ready_for_evolution;
@@ -104,4 +107,5 @@ private:
 	unsigned N;
 
 	std::vector<Car*> cars;
+	bool pause;
 };

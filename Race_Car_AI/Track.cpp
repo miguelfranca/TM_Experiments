@@ -1,7 +1,8 @@
 #include "Track.h"
 
 
-Track::Track(sf::RenderTarget* renderer) : GF::Widget(renderer)
+Track::Track(sf::RenderTarget* renderer) : GF::Widget(renderer), show_button(renderer, sf::Vector2f(200, 100), 
+		sf::Color::White, sf::Color::Black, sf::Color::Black, sf::Color::White), show(true)
 { 
 	if (!track.create(SCREENWIDTH, SCREENHEIGHT))
 		exit(1);
@@ -13,6 +14,10 @@ Track::Track(sf::RenderTarget* renderer) : GF::Widget(renderer)
 	checkpoints.push_back(0);
 
 	sprite = new sf::Sprite(track.getTexture());
+
+	show_button.setTextSize(35);
+	show_button.setText(std::string("Show/Hide\nTrack"));	
+	show_button.setPos(sf::Vector2f(500, 100));
 }
 
 Track::~Track() 
@@ -25,7 +30,9 @@ Track::~Track()
 
 bool Track::draw()
 {
-	m_target->draw(*sprite);
+	if(show)
+		m_target->draw(*sprite);
+	show_button.draw();
 	return true;
 }
 
@@ -64,6 +71,10 @@ bool Track::handleEvent(GF::Event &event)
 	if(GF::Mouse::Left.released(event) || GF::Mouse::Right.released(event))
 		image = track.getTexture().copyToImage();
 
+	show_button.handleEvent(event);
+	if(show_button.isClicked(event, (sf::RenderWindow&)(*m_target)))
+		show = !show;
+
 	return true;
 }
 
@@ -89,3 +100,14 @@ void Track::saveAndFlip()
 	sprite->setScale(1.0, -1.0);
 	sprite->setPosition(0.0, sprite->getTextureRect().height);
 }
+
+bool Track::isOverButton(){
+	return show_button.isRolledOn( (sf::RenderWindow&)(*m_target));
+}
+
+void Track::save(const std::string &filename) const {
+	sf::Image im = image;
+	im.flipVertically();
+	im.saveToFile(filename);
+}
+
