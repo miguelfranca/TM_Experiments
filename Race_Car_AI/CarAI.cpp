@@ -49,7 +49,7 @@ bool CarAI::onCreate()
 
 	// NEAT
 	ga.track = track;
-	ga.addCriteria(GA::StopReason::BestMaximum, {3*500});
+	ga.addCriteria(GA::StopReason::BestMaximum, {BEST_FITNESS});
 	ga.setEvaluate(fitnessFunc, GA::MAXIMIZE);
 
 	// waits until track is drawn
@@ -85,12 +85,13 @@ bool CarAI::handle_Track_Car_events(GF::Event &event){
 		being_dragged = false;
 
 	if(GF::Mouse::Left.isPressed() && !being_dragged && !button->isRolledOn(window) &&
-		!track->isOverButton() && !save_track_button->isRolledOn(window) && !save_nn_button->isRolledOn(window)){
+		!track->isOverButton() && !save_track_button->isRolledOn(window) && !save_nn_button->isRolledOn(window))
+	{
 		track->addCircle(GF::Mouse::getPosition(window));
-	track->saveAndFlip();
-}
+		track->saveAndFlip();
+	}
 
-return true;
+	return true;
 }
 
 	// first thing to be called every frame
@@ -99,6 +100,10 @@ bool CarAI::onHandleEvent(GF::Event& event)
 	static GF::Button<>* pause_button = (GF::Button<>*)getWidget("Pause_button");
 	static GF::Button<>* save_track_button = (GF::Button<>*)getWidget("save_track_button");
 	static GF::Button<>* save_nn_button = (GF::Button<>*)getWidget("save_nn_button");
+
+	if(getFPS() < 230) return true;
+
+	event.showMessage();
 
 	if(!pause){
 		static GF::Button<>* button = (GF::Button<>*)getWidget("Evolver_button");
@@ -145,6 +150,9 @@ bool CarAI::onHandleEvent(GF::Event& event)
 bool CarAI::onUpdate(const float fElapsedTime, const float fTotalTime)
 {
 	const float elapsedTime = 1./240.;
+
+	if(getFPS() < 230) return true;
+
 	if(!pause){
 
 		if(drawing && ready_for_evolution){
@@ -230,7 +238,7 @@ bool CarAI::onDraw()
 
 		// becomes true if any car is alive
 		bool alive = false; 
-		for(unsigned i = 1; i < N; ++i){
+		for(unsigned i = 0; i < N; ++i){
 			if(cars[i]->alive){
 				cars[i]->alive = alive_condition(track_im, track, cars[i]);
 				cars[i]->draw();
@@ -245,6 +253,7 @@ bool CarAI::onDraw()
 				return false;
 			}
 		}
+
 		window.draw(network_im);
 	}
 
@@ -288,7 +297,7 @@ void CarAI::reset(){
 
 	unsigned count = 0;
 
-	while(lastFitness == ga.getBestFitness() && count < 4){
+	while(lastFitness == ga.getBestFitness() && count < 4 && ga.getBestFitness() < BEST_FITNESS){
 		ga.step();
 		count++;
 	}

@@ -1,13 +1,14 @@
 #pragma once
 
 #include <iostream>
+
 #include "Game_Framework/main.h"
 #include "Game_Framework/GUI.h"
 #include "Game_Framework/sfml.h"
 #include "Game_Framework/Tools.h"
+
 #include "NEAT_GA.hpp"
 #include "Image.hpp"
-
 
 #include "Car.h"
 #include "Track.h"
@@ -17,6 +18,8 @@
 #define CHECKPOINT_BOOST 5.
 #define LAPS 3.
 #define TIME_BETWEEN_CHECKPOINTS 3. // seg
+
+#define BEST_FITNESS 299.
 
 #define INPUT_FACTOR 4.
 #define DRAW_SIZE 50
