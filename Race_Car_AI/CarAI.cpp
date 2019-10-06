@@ -101,9 +101,9 @@ bool CarAI::onHandleEvent(GF::Event& event)
 	static GF::Button<>* save_track_button = (GF::Button<>*)getWidget("save_track_button");
 	static GF::Button<>* save_nn_button = (GF::Button<>*)getWidget("save_nn_button");
 
-	if(getFPS() < 230) return true;
+	if(getFPS() < getMaxFPS() * 0.9) return true;
 
-	event.showMessage();
+	// event.showMessage();
 
 	if(!pause){
 		static GF::Button<>* button = (GF::Button<>*)getWidget("Evolver_button");
@@ -131,12 +131,12 @@ bool CarAI::onHandleEvent(GF::Event& event)
 
 	if(save_nn_button->isClicked(event, window)){
 		std::string append = std::to_string(time(NULL)) + "_" + std::to_string((int)clock());
-		ga.getBest().write("car_nn_" + append + ".txt");
+		ga.getBest().write("BestCar.txt");
 
-		sf::RenderTexture tt;
-		tt.create(1920, 1080);
-		tt.draw(image->makeImage(1920, 1080));
-		tt.getTexture().copyToImage().saveToFile("car_nn_image_" + append + ".png");
+		// sf::RenderTexture tt;
+		// tt.create(1920, 1080);
+		// tt.draw(image->makeImage(1920, 1080));
+		// tt.getTexture().copyToImage().saveToFile("car_nn_image_" + append + ".png");
 	}
 
 	if(pause_button->isClicked(event, window))
@@ -149,9 +149,9 @@ bool CarAI::onHandleEvent(GF::Event& event)
 	// called every frame before draw
 bool CarAI::onUpdate(const float fElapsedTime, const float fTotalTime)
 {
-	const float elapsedTime = 1./240.;
+	// const float elapsedTime = 1./60.;
 
-	if(getFPS() < 230) return true;
+	if(getFPS() < getMaxFPS() * 0.9) return true;
 
 	if(!pause){
 
@@ -170,8 +170,8 @@ bool CarAI::onUpdate(const float fElapsedTime, const float fTotalTime)
 					if(cars[a]->alive){
 						VecD out = pop->species[i]->pop[iter]->I.evaluate(VecD(cars[a]->getSensors()) * INPUT_FACTOR / SCREENWIDTH) * 2. - 1.;
 						cars[a]->steer_gas(out[0], out[1]);
-						cars[a]->update(elapsedTime, fTotalTime);
-						cars[a]->t += elapsedTime;
+						cars[a]->update(fElapsedTime, fTotalTime);
+						cars[a]->t += fElapsedTime;
 					}
 					++a;
 					--n;
@@ -185,8 +185,8 @@ bool CarAI::onUpdate(const float fElapsedTime, const float fTotalTime)
 					if(cars[a]->alive){
 						VecD out = pop->species[i]->getBest().evaluate(VecD(cars[a]->getSensors()) * INPUT_FACTOR / SCREENWIDTH) * 2. - 1.;
 						cars[a]->steer_gas(out[0], out[1]);
-						cars[a]->update(elapsedTime, fTotalTime);
-						cars[a]->t += elapsedTime;
+						cars[a]->update(fElapsedTime, fTotalTime);
+						cars[a]->t += fElapsedTime;
 					}
 					++a;
 				}
@@ -196,8 +196,8 @@ bool CarAI::onUpdate(const float fElapsedTime, const float fTotalTime)
 		// selects best Network
 			VecD out = pop->getBest().evaluate(VecD(cars[a]->getSensors()) * INPUT_FACTOR / SCREENWIDTH) * 2. - 1.;
 			cars[a]->steer_gas(out[0], out[1]);
-			cars[a]->update(elapsedTime, fTotalTime);
-			cars[a]->t += elapsedTime;
+			cars[a]->update(fElapsedTime, fTotalTime);
+			cars[a]->t += fElapsedTime;
 			cars[a]->setColor(sf::Color::Green);
 		}
 
