@@ -7,31 +7,31 @@ bool CarAI::onCreate()
 {
 	setClearColor(sf::Color::White);
 
-	GF::Button<GF::Rectangle>* pause_button  = new GF::Button<GF::Rectangle>(&window, sf::Vector2f(200, 100), 
+	GF::Button<GF::Rectangle>* pause_button  = new GF::Button<GF::Rectangle>(&window, sf::Vector2f(100* SW, 50 * SH), 
 		sf::Color::White, sf::Color::Black, sf::Color::Black, sf::Color::White);
 	pause_button->setText(std::string("Pause"));
-	pause_button->setPos(sf::Vector2f(200, 100));
+	pause_button->setPos(sf::Vector2f(100 * SW, 50 * SH));
 	addWidget(pause_button, "Pause_button");
 
-	GF::Button<GF::Rectangle>* evolver_button  = new GF::Button<GF::Rectangle>(&window, sf::Vector2f(200, 100), 
+	GF::Button<GF::Rectangle>* evolver_button  = new GF::Button<GF::Rectangle>(&window, sf::Vector2f(100* SW, 50 * SH), 
 		sf::Color::White, sf::Color::Black, sf::Color::Black, sf::Color::White);
-	evolver_button->setTextSize(35);
+	evolver_button->setTextSize(35 * SH);
 	evolver_button->setText(std::string("Evolver"));
-	evolver_button->setPos(sf::Vector2f(800, 100));
+	evolver_button->setPos(sf::Vector2f(400 * SW, 50 * SH));
 	addWidget(evolver_button, "Evolver_button");
 
-	GF::Button<GF::Rectangle>* save_track_button  = new GF::Button<GF::Rectangle>(&window, sf::Vector2f(200, 100), 
+	GF::Button<GF::Rectangle>* save_track_button  = new GF::Button<GF::Rectangle>(&window, sf::Vector2f(100 * SW, 50 * SH), 
 		sf::Color::White, sf::Color::Black, sf::Color::Black, sf::Color::White);
-	save_track_button->setTextSize(35);
+	save_track_button->setTextSize(35 * SH);
 	save_track_button->setText(std::string("Save Track"));
-	save_track_button->setPos(sf::Vector2f(1100, 100));
+	save_track_button->setPos(sf::Vector2f(550 * SW, 50 * SH));
 	addWidget(save_track_button, "save_track_button");
 
-	GF::Button<GF::Rectangle>* save_nn_button  = new GF::Button<GF::Rectangle>(&window, sf::Vector2f(200, 100), 
+	GF::Button<GF::Rectangle>* save_nn_button  = new GF::Button<GF::Rectangle>(&window, sf::Vector2f(100* SW, 50 * SH), 
 		sf::Color::White, sf::Color::Black, sf::Color::Black, sf::Color::White);
-	save_nn_button->setTextSize(35);
+	save_nn_button->setTextSize(35 * SH);
 	save_nn_button->setText(std::string("Save NN"));
-	save_nn_button->setPos(sf::Vector2f(1400, 100));
+	save_nn_button->setPos(sf::Vector2f(700 * SW, 50 * SH));
 	addWidget(save_nn_button, "save_nn_button");
 
 
@@ -40,11 +40,11 @@ bool CarAI::onCreate()
 
 	// AI = new Car(&window, TOPLEFT_F, 40, 80, track, "res/textures/car0.png");
 	for(unsigned i = 0; i < 50; ++i)
-		cars.push_back(new Car(&window, TOPLEFT_F, 40, 80, track, "res/textures/car0.png"));
+		cars.push_back(new Car(&window, TOPLEFT_F, 25 * SW, 50 * SH, track, "res/textures/car0.png"));
 
 
 	// User's car
-	addWidget(new Car(&window, CENTER_WINDOW, 40, 80, track, "res/textures/car0.png"), "car");
+	addWidget(new Car(&window, CENTER_WINDOW, 25 * SW, 50 * SH, track, "res/textures/car0.png"), "car");
 	((Car*)getWidget("car"))->setColor(sf::Color::Blue);
 
 	// NEAT

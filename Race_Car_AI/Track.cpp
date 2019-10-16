@@ -1,7 +1,7 @@
 #include "Track.h"
 
 
-Track::Track(sf::RenderTarget* renderer) : GF::Widget(renderer), show_button(renderer, sf::Vector2f(200, 100), 
+Track::Track(sf::RenderTarget* renderer) : GF::Widget(renderer), show_button(renderer, sf::Vector2f(100 * SW, 50 * SH), 
 		sf::Color::White, sf::Color::Black, sf::Color::Black, sf::Color::White), show(true)
 { 
 	if (!track.create(SCREENWIDTH, SCREENHEIGHT))
@@ -15,9 +15,9 @@ Track::Track(sf::RenderTarget* renderer) : GF::Widget(renderer), show_button(ren
 
 	sprite = new sf::Sprite(track.getTexture());
 
-	show_button.setTextSize(35);
+	show_button.setTextSize(35 * SW);
 	show_button.setText(std::string("Show/Hide\nTrack"));	
-	show_button.setPos(sf::Vector2f(500, 100));
+	show_button.setPos(sf::Vector2f(250 * SW, 50 * SH));
 }
 
 Track::~Track() 
@@ -44,7 +44,7 @@ void Track::addCircle(sf::Vector2f pos, int index)
 		track.draw(*circle);
 	}
 
-	if(dist(pos, circles[checkpoints.back()]->getPosition()) >= 100.)
+	if(dist(pos, circles[checkpoints.back()]->getPosition()) >= 100. * SW)
 		checkpoints.push_back(index == -1 ? (circles.size() - 1) : index);
 }
 

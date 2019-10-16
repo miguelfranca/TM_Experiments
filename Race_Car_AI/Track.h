@@ -8,7 +8,7 @@
 #include <vector>
 #include <math.h>
 
-#define TRACK_RADIUS 80
+#define TRACK_RADIUS 40 * SW
 
 class Track : public GF::Widget{
 public:

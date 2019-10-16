@@ -139,7 +139,7 @@ bool Car::draw()
 		}
 		// DRAWS SENSOR CIRCLES
 		For2(i, sensors.size()) {
-			GF::Circle circle(10, sensors[i], sf::Color(41 * i, -41 * i, 41 * i));
+			GF::Circle circle(5 * SW, sensors[i], sf::Color(41 * i, -41 * i, 41 * i));
 			m_target->draw(circle);
 		}
 	}
