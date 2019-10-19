@@ -13,8 +13,8 @@
 class MyGame : public GF::Game {
 public:
 
-	MyGame() : image(nullptr), AI_Active(sf::Vector2f(0, 50)), time(sf::Vector2f(0, 200)), generation(sf::Vector2f(0, 100)),
-	population(sf::Vector2f(0, 150)), fitness(sf::Vector2f(0, 250))
+	MyGame() : image(nullptr), AI_Active(sf::Vector2f(0, 50 * SH)), time(sf::Vector2f(0, 200 * SH)), generation(sf::Vector2f(0, 100 * SH)),
+	population(sf::Vector2f(0, 150 * SH)), fitness(sf::Vector2f(0, 250 * SH))
 	{ this->pop = nullptr;}
 
 	void updatePopulation(const Population<NEAT::Network>* pop, unsigned n = 1) { 
@@ -195,8 +195,8 @@ public:
 
 
 		GF::Text text("E - Exit 	A - Evolution 	B - Best AI 	D - Player _ Double 	S - Player _ Single 	SPACE - Restart player 	ESC - Skip Generation (Evolution) 	(ESC + P) - Skip Generation fast",
-			TOPLEFT_F + sf::Vector2f(1325, 30),
-			15);
+			TOPLEFT_F + sf::Vector2f(650 * SW, 30 * SH),
+			15 * SW);
 		window.draw(text);
 		window.draw(network_im);
 

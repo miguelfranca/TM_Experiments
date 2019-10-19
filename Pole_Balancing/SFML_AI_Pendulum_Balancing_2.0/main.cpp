@@ -73,7 +73,7 @@ int main() {
 
 	NEAT::Image image(*best,"params_image.txt");
 	image.evolve();
-	image.draw();
+	image.draw(700 * SW, 600 * SH);
 	// image.save();
 	image.wait();
 	return 0;
