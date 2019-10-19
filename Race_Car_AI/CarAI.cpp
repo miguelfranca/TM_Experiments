@@ -1,34 +1,39 @@
 #include "CarAI.h"
 
-CarAI::CarAI(std::string t) : ga("params.txt"), image(nullptr), lastFitness(0.), AI(nullptr), pause(false) { title = t; }
+CarAI::CarAI(std::string t) : ga("params.txt"), image(nullptr), lastFitness(0.), AI(nullptr),
+	pause(false) { title = t; }
 
-	// called once before the game starts
+// called once before the game starts
 bool CarAI::onCreate()
 {
 	setClearColor(sf::Color::White);
 
-	GF::Button<GF::Rectangle>* pause_button  = new GF::Button<GF::Rectangle>(&window, sf::Vector2f(100* SW, 50 * SH), 
-		sf::Color::White, sf::Color::Black, sf::Color::Black, sf::Color::White);
+	GF::Button<GF::Rectangle>* pause_button  = new GF::Button<GF::Rectangle>(&window,
+	        sf::Vector2f(100 * SW, 50 * SH),
+	        sf::Color::White, sf::Color::Black, sf::Color::Black, sf::Color::White);
 	pause_button->setText(std::string("Pause"));
 	pause_button->setPos(sf::Vector2f(100 * SW, 50 * SH));
 	addWidget(pause_button, "Pause_button");
 
-	GF::Button<GF::Rectangle>* evolver_button  = new GF::Button<GF::Rectangle>(&window, sf::Vector2f(100* SW, 50 * SH), 
-		sf::Color::White, sf::Color::Black, sf::Color::Black, sf::Color::White);
+	GF::Button<GF::Rectangle>* evolver_button  = new GF::Button<GF::Rectangle>(&window,
+	        sf::Vector2f(100 * SW, 50 * SH),
+	        sf::Color::White, sf::Color::Black, sf::Color::Black, sf::Color::White);
 	evolver_button->setTextSize(35 * SH);
 	evolver_button->setText(std::string("Evolver"));
 	evolver_button->setPos(sf::Vector2f(400 * SW, 50 * SH));
 	addWidget(evolver_button, "Evolver_button");
 
-	GF::Button<GF::Rectangle>* save_track_button  = new GF::Button<GF::Rectangle>(&window, sf::Vector2f(100 * SW, 50 * SH), 
-		sf::Color::White, sf::Color::Black, sf::Color::Black, sf::Color::White);
+	GF::Button<GF::Rectangle>* save_track_button  = new GF::Button<GF::Rectangle>(&window,
+	        sf::Vector2f(100 * SW, 50 * SH),
+	        sf::Color::White, sf::Color::Black, sf::Color::Black, sf::Color::White);
 	save_track_button->setTextSize(35 * SH);
 	save_track_button->setText(std::string("Save Track"));
 	save_track_button->setPos(sf::Vector2f(550 * SW, 50 * SH));
 	addWidget(save_track_button, "save_track_button");
 
-	GF::Button<GF::Rectangle>* save_nn_button  = new GF::Button<GF::Rectangle>(&window, sf::Vector2f(100* SW, 50 * SH), 
-		sf::Color::White, sf::Color::Black, sf::Color::Black, sf::Color::White);
+	GF::Button<GF::Rectangle>* save_nn_button  = new GF::Button<GF::Rectangle>(&window,
+	        sf::Vector2f(100 * SW, 50 * SH),
+	        sf::Color::White, sf::Color::Black, sf::Color::Black, sf::Color::White);
 	save_nn_button->setTextSize(35 * SH);
 	save_nn_button->setText(std::string("Save NN"));
 	save_nn_button->setPos(sf::Vector2f(700 * SW, 50 * SH));
@@ -39,7 +44,7 @@ bool CarAI::onCreate()
 	addWidget(track, "track");
 
 	// AI = new Car(&window, TOPLEFT_F, 40, 80, track, "res/textures/car0.png");
-	for(unsigned i = 0; i < 50; ++i)
+	for (unsigned i = 0; i < 50; ++i)
 		cars.push_back(new Car(&window, TOPLEFT_F, 25 * SW, 50 * SH, track, "res/textures/car0.png"));
 
 
@@ -58,10 +63,13 @@ bool CarAI::onCreate()
 	// displays cars when true
 	drawing = true;
 
+	// track->load("track_1571492387_797582.out");
+
 	return true;
 }
 
-bool CarAI::handle_Track_Car_events(GF::Event &event){
+bool CarAI::handle_Track_Car_events(GF::Event& event)
+{
 	static Track* track = (Track*)getWidget("track");
 	static GF::Button<>* button = (GF::Button<>*)getWidget("Evolver_button");
 	static GF::Button<>* save_track_button = (GF::Button<>*)getWidget("save_track_button");
@@ -70,23 +78,23 @@ bool CarAI::handle_Track_Car_events(GF::Event &event){
 	static bool being_dragged = false;
 	static Car* car = (Car*)getWidget("car");
 
-	if(!window.hasFocus() || event.type == sf::Event::GainedFocus) return true;
+	if (!window.hasFocus() || event.type == sf::Event::GainedFocus) return true;
 
-	if(GF::Mouse::Left.clicked(event) && car->isClicked())
+	if (GF::Mouse::Left.clicked(event) && car->isClicked())
 		being_dragged = true;
 
-	if(being_dragged && GF::Mouse::Left.isPressed() && car->isClicked())
+	if (being_dragged && GF::Mouse::Left.isPressed() && car->isClicked())
 		car->setPosition(GF::Mouse::getPosition(window));
 
-	if(being_dragged && GF::Mouse::Wheel.moved(event))
+	if (being_dragged && GF::Mouse::Wheel.moved(event))
 		car->rotate(GF::Mouse::Wheel.delta(event) * 3.);
 
-	if(GF::Mouse::Left.released(event))
+	if (GF::Mouse::Left.released(event))
 		being_dragged = false;
 
-	if(GF::Mouse::Left.isPressed() && !being_dragged && !button->isRolledOn(window) &&
-		!track->isOverButton() && !save_track_button->isRolledOn(window) && !save_nn_button->isRolledOn(window))
-	{
+	if (GF::Mouse::Left.isPressed() && !being_dragged && !button->isRolledOn(window) &&
+	    !track->isOverButton() && !save_track_button->isRolledOn(window)
+	    && !save_nn_button->isRolledOn(window) && event.type != GF::Event::Closed) {
 		track->addCircle(GF::Mouse::getPosition(window));
 		track->saveAndFlip();
 	}
@@ -94,42 +102,43 @@ bool CarAI::handle_Track_Car_events(GF::Event &event){
 	return true;
 }
 
-	// first thing to be called every frame
+// first thing to be called every frame
 bool CarAI::onHandleEvent(GF::Event& event)
 {
 	static GF::Button<>* pause_button = (GF::Button<>*)getWidget("Pause_button");
 	static GF::Button<>* save_track_button = (GF::Button<>*)getWidget("save_track_button");
 	static GF::Button<>* save_nn_button = (GF::Button<>*)getWidget("save_nn_button");
 
-	if(getFPS() < getMaxFPS() * 0.9) return true;
+	if (getFPS() < getMaxFPS() * 0.9) return true;
 
 	// event.showMessage();
 
-	if(!pause){
+	if (!pause) {
 		static GF::Button<>* button = (GF::Button<>*)getWidget("Evolver_button");
 
-		if(!ready_for_evolution)
-			if(!handle_Track_Car_events(event)) return false;
+		if (!ready_for_evolution)
+			if (!handle_Track_Car_events(event)) return false;
 
-		static GF::ToggleKey S (sf::Keyboard::S);
-		if(S.isKeyReleasedOnce(event)){
+		static GF::ToggleKey S(sf::Keyboard::S);
+
+		if (S.isKeyReleasedOnce(event)) {
 			ga.step();
 			reset();
 		}
 
-		if(button->isClicked(event, window)){
+		if (button->isClicked(event, window)) {
 			ready_for_evolution = true;
 			stop = ga.start();
 			reset();
 		}
 	}
 
-	if(save_track_button->isClicked(event, window)){
+	if (save_track_button->isClicked(event, window)) {
 		static Track* track = (Track*)getWidget("track");
-		track->save("track_" + std::to_string(time(NULL)) + "_" + std::to_string((int)clock()) + ".png");
+		track->save("track_" + std::to_string(time(NULL)) + "_" + std::to_string((int)clock()) + ".out");
 	}
 
-	if(save_nn_button->isClicked(event, window)){
+	if (save_nn_button->isClicked(event, window)) {
 		std::string append = std::to_string(time(NULL)) + "_" + std::to_string((int)clock());
 		ga.getBest().write("BestCar.txt");
 
@@ -139,70 +148,80 @@ bool CarAI::onHandleEvent(GF::Event& event)
 		// tt.getTexture().copyToImage().saveToFile("car_nn_image_" + append + ".png");
 	}
 
-	if(pause_button->isClicked(event, window))
+	if (pause_button->isClicked(event, window))
 		pause = !pause;
 
 	return true;
 }
 
 
-	// called every frame before draw
+// called every frame before draw
 bool CarAI::onUpdate(const float fElapsedTime, const float fTotalTime)
 {
-	// const float elapsedTime = 1./60.;
+	// const float elapsedTime = 1. / 120.;
+	const float elapsedTime = fElapsedTime;
 
-	if(getFPS() < getMaxFPS() * 0.9) return true;
+	if (getFPS() < getMaxFPS() * 0.90) return true;
 
-	if(!pause){
+	if (!pause) {
 
-		if(drawing && ready_for_evolution){
+		if (drawing && ready_for_evolution) {
 			unsigned n = N; // counter for species inside the whole population
 			unsigned iter = 0; // counter for individuals inside species
 			unsigned a = 0; // counter for cars vector
 
 			const Population<NEAT::Network>* pop = ga.getPopulation();
 
-		// selects some networks
-			while(n > pop->species.size()){
-				for(unsigned i=0; i<pop->species.size(); ++i){
-					if(pop->species[i]->bestRank == iter) continue;
-					if(pop->species[i]->pop.size() <= iter) continue;
-					if(cars[a]->alive){
-						VecD out = pop->species[i]->pop[iter]->I.evaluate(VecD(cars[a]->getSensors()) * INPUT_FACTOR / SCREENWIDTH) * 2. - 1.;
+			// selects some networks
+			while (n > pop->species.size()) {
+				for (unsigned i = 0; i < pop->species.size(); ++i) {
+					if (pop->species[i]->bestRank == iter) continue;
+
+					if (pop->species[i]->pop.size() <= iter) continue;
+
+					if (cars[a]->alive) {
+						VecD out = pop->species[i]->pop[iter]->I.evaluate(VecD(cars[a]->getSensors()) * INPUT_FACTOR /
+						           SCREENWIDTH) * 2. - 1.;
 						cars[a]->steer_gas(out[0], out[1]);
-						cars[a]->update(fElapsedTime, fTotalTime);
-						cars[a]->t += fElapsedTime;
+						cars[a]->update(elapsedTime, fTotalTime);
+						cars[a]->t += elapsedTime;
 					}
+
 					++a;
 					--n;
 				}
+
 				++iter;
 			}
 
 			// selects best of each species, except for best species (for different color)
-			for(unsigned i=0; i<pop->species.size() && n>1; ++i){
-				if(pop->bestSpecies != i){
-					if(cars[a]->alive){
-						VecD out = pop->species[i]->getBest().evaluate(VecD(cars[a]->getSensors()) * INPUT_FACTOR / SCREENWIDTH) * 2. - 1.;
+			for (unsigned i = 0; i < pop->species.size() && n > 1; ++i) {
+				if (pop->bestSpecies != i) {
+					if (cars[a]->alive) {
+						VecD out = pop->species[i]->getBest().evaluate(VecD(cars[a]->getSensors()) * INPUT_FACTOR /
+						           SCREENWIDTH) * 2. - 1.;
 						cars[a]->steer_gas(out[0], out[1]);
-						cars[a]->update(fElapsedTime, fTotalTime);
-						cars[a]->t += fElapsedTime;
+						cars[a]->update(elapsedTime, fTotalTime);
+						cars[a]->t += elapsedTime;
 					}
+
 					++a;
 				}
+
 				--n;
 			}
 
-		// selects best Network
-			VecD out = pop->getBest().evaluate(VecD(cars[a]->getSensors()) * INPUT_FACTOR / SCREENWIDTH) * 2. - 1.;
+			// selects best Network
+			VecD out = pop->getBest().evaluate(VecD(cars[a]->getSensors()) * INPUT_FACTOR / SCREENWIDTH) * 2. -
+			           1.;
 			cars[a]->steer_gas(out[0], out[1]);
-			cars[a]->update(fElapsedTime, fTotalTime);
-			cars[a]->t += fElapsedTime;
+			cars[a]->update(elapsedTime, fTotalTime);
+			cars[a]->t += elapsedTime;
 			cars[a]->setColor(sf::Color::Green);
 		}
 
 		// if all cars died
-		if(!drawing && ready_for_evolution){
+		if (!drawing && ready_for_evolution) {
 			// new generation
 			stop = ga.step();
 			drawing = true;
@@ -213,13 +232,13 @@ bool CarAI::onUpdate(const float fElapsedTime, const float fTotalTime)
 	return true;
 };
 
-	// last thing to be called every frame
+// last thing to be called every frame
 bool CarAI::onDraw()
 {
-	if(drawing && ready_for_evolution){
+	if (drawing && ready_for_evolution) {
 		static Track* track = (Track*)getWidget("track");
 
-		sf::Image &track_im = track->getTrack();
+		sf::Image& track_im = track->getTrack();
 
 		// std::cout << "Start: " << track->start_pos() << "Rotation: " << track->start_rotation() << std::endl;
 		// std::cout << "Position: " << AI->getPosition() << std::endl;
@@ -237,18 +256,20 @@ bool CarAI::onDraw()
 		// AI->draw()
 
 		// becomes true if any car is alive
-		bool alive = false; 
-		for(unsigned i = 0; i < N; ++i){
-			if(cars[i]->alive){
+		bool alive = false;
+
+		for (unsigned i = 0; i < N; ++i) {
+			if (cars[i]->alive) {
 				cars[i]->alive = alive_condition(track_im, track, cars[i]);
 				cars[i]->draw();
 				alive |= cars[i]->alive;
 			}
 		}
 
-		if(!alive){
+		if (!alive) {
 			drawing = false;
-			if(stop != GA::StopReason::Undefined){
+
+			if (stop != GA::StopReason::Undefined) {
 				ga.finish(stop);
 				return false;
 			}
@@ -262,14 +283,16 @@ bool CarAI::onDraw()
 
 void CarAI::onDestroy()
 {
-	if(AI) delete AI;
-	for(unsigned i = 0; i < cars.size(); ++i)
+	if (AI) delete AI;
+
+	for (unsigned i = 0; i < cars.size(); ++i)
 		delete cars[i];
 
-	if(image) delete image;
+	if (image) delete image;
 }
 
-void CarAI::reset(){
+void CarAI::reset()
+{
 	calculate_size();
 	static const Track* track = (Track*)getWidget("track");
 
@@ -278,8 +301,8 @@ void CarAI::reset(){
 	// AI->setRotation(track->start_rotation());
 	// AI->update(0., 0.);
 
-	for(unsigned i = 0; i < N; ++i){
-		if(cars[i]){
+	for (unsigned i = 0; i < N; ++i) {
+		if (cars[i]) {
 			cars[i]->reset();
 			cars[i]->setPosition(track->start_pos());
 			cars[i]->setRotation(track->start_rotation());
@@ -288,8 +311,9 @@ void CarAI::reset(){
 		}
 	}
 
-	if(image) delete image;
-	image = new NEAT::Image(ga.getBest(),"params_image.txt");
+	if (image) delete image;
+
+	image = new NEAT::Image(ga.getBest(), "params_image.txt");
 	image->evolve();
 	// image->draw(300. * SW, 200. * SH);
 	network_im = image->makeImage(200 * SW, 200 * SH);
@@ -297,7 +321,7 @@ void CarAI::reset(){
 
 	unsigned count = 0;
 
-	while(lastFitness == ga.getBestFitness() && count < 4 && ga.getBestFitness() < BEST_FITNESS){
+	while (lastFitness == ga.getBestFitness() && count < 4 && ga.getBestFitness() < BEST_FITNESS) {
 		ga.step();
 		count++;
 	}
@@ -305,10 +329,12 @@ void CarAI::reset(){
 	lastFitness = ga.getBestFitness();
 }
 
-void CarAI::calculate_size(){
+void CarAI::calculate_size()
+{
 	N = 0;
 	const Population<NEAT::Network>* pop = ga.getPopulation();
-	for(unsigned i=0; i<pop->species.size(); ++i)
+
+	for (unsigned i = 0; i < pop->species.size(); ++i)
 		N += pop->species[i]->pop.size();
 
 	N = std::min(DRAW_SIZE, (int)N);

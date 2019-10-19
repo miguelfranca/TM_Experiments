@@ -16,3 +16,5 @@ SFML_AI_Pendulum_Balancing/
 *.DS_Store
 .fuse_hidden*
 /Race_Car_AI_Loaded/
+
+*.floo*

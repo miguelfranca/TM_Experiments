@@ -43,6 +43,7 @@ public:
 	bool isOverButton();
 
 	void save(const std::string &filename) const ;
+	void load(const std::string &filename);
 
 private:
 	std::vector<GF::Circle*> circles;
