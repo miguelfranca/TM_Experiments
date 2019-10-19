@@ -135,6 +135,7 @@ void Track::load(const std::string& filename)
 	track.clear(sf::Color::Transparent);
 	circles.clear();
 	checkpoints.clear();
+	checkpoints.push_back(0);
 
 	std::ifstream file;
 	file.open(filename, std::ios::in);
@@ -151,5 +152,6 @@ void Track::load(const std::string& filename)
 
 	file.close();
 
+	image = track.getTexture().copyToImage();
 	saveAndFlip();
 }

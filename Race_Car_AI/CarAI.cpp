@@ -63,7 +63,7 @@ bool CarAI::onCreate()
 	// displays cars when true
 	drawing = true;
 
-	// track->load("track_1571492387_797582.out");
+	track->load("track_1571493472_4457993.out");
 
 	return true;
 }
@@ -158,10 +158,11 @@ bool CarAI::onHandleEvent(GF::Event& event)
 // called every frame before draw
 bool CarAI::onUpdate(const float fElapsedTime, const float fTotalTime)
 {
-	// const float elapsedTime = 1. / 120.;
+	// const float elapsedTime = 1. / 350.;
 	const float elapsedTime = fElapsedTime;
 
 	if (getFPS() < getMaxFPS() * 0.90) return true;
+
 
 	if (!pause) {
 
