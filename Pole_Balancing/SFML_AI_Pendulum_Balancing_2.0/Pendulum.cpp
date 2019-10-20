@@ -23,6 +23,8 @@ void Pendulum::init(sf::RenderTarget* renderer){
 
 	x0 = restart();
 	move(x0[2],x0[1]);
+
+	allowUserInput = false;
 }
 
 
@@ -64,6 +66,11 @@ net(indv_net)
 	init(renderer);
 }
 
+void Pendulum::setAllowUserInput(bool allow)
+{
+	allowUserInput = allow;
+}
+
 
 bool Pendulum::handleEvent(GF::Event& event)
 {
@@ -71,9 +78,9 @@ bool Pendulum::handleEvent(GF::Event& event)
 }
 
 
-VecD Pendulum::step(VecD x0, double dt, const NEAT::Network& net, ODEsolver& eq){
-	while(x0[1]>2.*M_PI)  x0[1] -= 4.*M_PI;
-	while(x0[1]<-2.*M_PI) x0[1] += 4.*M_PI;
+VecD Pendulum::step(VecD x0, double dt, const NEAT::Network& net, ODEsolver& eq, double extra_A){
+	// while(x0[1]>2.*M_PI)  x0[1] -= 4.*M_PI;
+	// while(x0[1]<-2.*M_PI) x0[1] += 4.*M_PI;
 
 	double AA = 0.;
 	VecD inputs(4);
@@ -82,7 +89,7 @@ VecD Pendulum::step(VecD x0, double dt, const NEAT::Network& net, ODEsolver& eq)
 	inputs[2] = (x0[3]/thetaDMAX 	+ 1.)/2.;
 	inputs[3] = (x0[4]/xDMAX 		+ 1.)/2.;
 	AA = A_MAGN * (2*(int)(net.evaluate(inputs)[0]+0.5)-1);
-	eq.setParams({ AA });
+	eq.setParams({ AA + extra_A });
 	return eq.stepRK4(x0, dt);
 }
 
@@ -90,7 +97,19 @@ bool Pendulum::update(const float fElapsedTime, const float fTotalTime)
 {
 	if(!isdead)
 	{
-		x0 = step(x0, fElapsedTime * SIM_SPEED, net, eq);
+		float A = 0.;
+		if(allowUserInput)
+		{
+			static GF::ToggleKey LEFT(sf::Keyboard::Left);
+			static GF::ToggleKey RIGHT(sf::Keyboard::Right);
+
+			if (LEFT.isKeyPressed())
+				A = -A_MAGN;
+			if (RIGHT.isKeyPressed())
+				A = A_MAGN;
+		}
+
+		x0 = step(x0, fElapsedTime * SIM_SPEED, net, eq, A);
 
 		move(x0[2],x0[1]);
 

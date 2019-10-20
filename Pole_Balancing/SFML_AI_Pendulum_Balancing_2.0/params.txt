@@ -11,9 +11,9 @@ numOutputs 							= 1
 //rateCrossoverAverage				= 0.4	//default = 0.4
 
 //mutation types probabilities
-//mutateRateNewConnection 			= 0.1 	//default = 0.2
-//mutateRateNewNode					= 0.1 	//default = 0.1
-//mutateRateWeightPerturbation 		= 0.8 	//default = 0.2
+mutateRateNewConnection 			= 0.03 	//default = 0.2
+mutateRateNewNode 					= 0.05 	//default = 0.1
+mutateRateWeightPerturbation 		= 0.8 	//default = 0.2 - best is 0.8, but it makes it less fun simulation wise
 //mutateRateWeightChange 			= 0.0 	//default 0.0
 //mutateRateToggle 					= 0.05 	//default = 0.05
 
@@ -39,7 +39,7 @@ mutateMaxPerturbation 				= 4 	//default = 0.75
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
 //size of population
-populationSize 				= 250
+populationSize 				= 150
 
 //top best 'eliteCount' individuals automatically pass to next generation
 eliteCount 					= 10 	//default = 0
@@ -59,7 +59,7 @@ speciationThreshold 		= 8.0 	//default = -1
 
 //age and penalty/boost given to organisms who are considered old or young
 //oldAge 					= 20 	//default = 20
-oldPenalty 					= 1 	//default = 0.01
+//oldPenalty 				= 0.01 	//default = 0.01
 //youthAge 					= 10 	//default = 10
 //youthBoost 				= 1.0 	//default = 1.0
 
@@ -86,8 +86,8 @@ maxGenerations 				= 300
 //bestStalledTol			= 1.e-8
 //bestStalledMax			= 15
 
-//averageRelativeStalledTol 	= 0.01
-//averageRelativeStalledMax 	= 15
+averageRelativeStalledTol 	= 0.01
+averageRelativeStalledMax 	= 15
 
 //bestRelativeStalledTol	= 0.1
 //bestRelativeStalledMax	= 15

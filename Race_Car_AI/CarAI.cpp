@@ -63,7 +63,7 @@ bool CarAI::onCreate()
 	// displays cars when true
 	drawing = true;
 
-	track->load("track_1571493472_4457993.out");
+	// track->load("track_1571493472_4457993.out");
 
 	return true;
 }

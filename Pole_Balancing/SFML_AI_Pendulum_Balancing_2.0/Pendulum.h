@@ -28,13 +28,15 @@ public:
 	Pendulum(sf::RenderTarget* renderer, const NEAT::Network& indv_net, const sf::Color);
 
 	static VecD invertedPendulumRHS(const VecD& x, const VecD& params);
-	static VecD step(VecD x0, double dt, const NEAT::Network& net, ODEsolver& eq);
+	static VecD step(VecD x0, double dt, const NEAT::Network& net, ODEsolver& eq, double extra_A = 0.);
 	static VecD restart();
 
 	bool handleEvent(GF::Event& event) override;
 
 	virtual bool update(const float fElapsedTime, const float fTotalTime) override;
 	virtual bool draw() override;
+
+	void setAllowUserInput(bool);
 
 public:
 	bool isdead;
@@ -58,6 +60,7 @@ protected:
 	VecD x0;
 
 	float m_lenght;
+	bool allowUserInput;
 
 	/////// NEAT ///////
 	NEAT::Network net;

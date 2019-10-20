@@ -30,7 +30,9 @@ public:
 
 		player_double = new UserDoublePendulum(&window);
 		player_single = new UserPendulum(&window);
-		BestAI = new Pendulum(&window, "../../../GAcpp/NEAT/v2/PoleBalancing_360/pole_best.txt");
+		// BestAI = new Pendulum(&window, "../../../GAcpp/NEAT/v2/PoleBalancing_360/pole_best.txt");
+		BestAI = new Pendulum(&window, "pole_best.txt");
+		BestAI->setAllowUserInput(true);
 
 		for(auto& pendulum : pendulums)
 			delete pendulum;
@@ -75,6 +77,8 @@ public:
 	// first thing to be called every frame
 	bool onHandleEvent(GF::Event& event) override
 	{
+		if (getFPS() < getMaxFPS() * 0.9) return true;
+
 		if(game_state == 0) 
 			image->handleEvent();
 
@@ -134,6 +138,8 @@ public:
 	// called every frame before draw
 	bool onUpdate(const float fElapsedTime, const float fTotalTime) override
 	{
+		if (getFPS() < getMaxFPS() * 0.9) return true;
+
 		if(game_state == 0){
 
 			bool out = false;
