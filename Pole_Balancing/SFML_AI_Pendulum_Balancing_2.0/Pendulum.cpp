@@ -41,8 +41,8 @@ net(indv_net)
 	std::ifstream f(indv_net.c_str());
 	if(f.good())
 		net.read(indv_net);
-	else 
-		exit(1);
+	else
+		errorMsg("File " + indv_net + " not found.");
 
 	init(renderer);
 }

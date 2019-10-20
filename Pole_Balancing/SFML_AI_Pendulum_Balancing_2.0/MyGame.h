@@ -30,7 +30,7 @@ public:
 
 		player_double = new UserDoublePendulum(&window);
 		player_single = new UserPendulum(&window);
-		BestAI = new Pendulum(&window, "/home/miguel/Desktop/Miguel França_Universidade/Programing/SFML/GAcpp/NEAT/v2/PoleBalancing_360/pole_best.txt");
+		BestAI = new Pendulum(&window, "../../../GAcpp/NEAT/v2/PoleBalancing_360/pole_best.txt");
 
 		for(auto& pendulum : pendulums)
 			delete pendulum;
