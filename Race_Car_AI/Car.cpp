@@ -133,12 +133,12 @@ bool Car::draw()
 {
 	if (show_sensors) {
 		/////////// DRAWS LINES INITIATING IN THE CAR ////////////////////////
-		For2(i, sensors.size()) {
+		for(unsigned i = 0; i < sensors.size(); ++i) {
 			GF::Line line (getPosition(), sensors[i], sf::Color::Black, sf::Color::Black);
 			m_target->draw(line);
 		}
 		// DRAWS SENSOR CIRCLES
-		For2(i, sensors.size()) {
+		for(unsigned i = 0; i < sensors.size(); ++i) {
 			GF::Circle circle(5 * SW, sensors[i], sf::Color(41 * i, -41 * i, 41 * i));
 			m_target->draw(circle);
 		}
@@ -225,7 +225,7 @@ void Car::updateSensors() {
 
 std::vector<double> Car::getSensors() {
 	std::vector<double> s;
-	For2(i, sensors.size())
+	for(unsigned i = 0; i < sensors.size(); ++i)
 		s.push_back(dist(getPosition(), sensors[i]));
 	return s;
 }

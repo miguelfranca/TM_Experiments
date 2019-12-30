@@ -1,4 +1,4 @@
-# By Tiago Franca
+# By Tiago Franca | Miguel Franca
 # Makefile to compile all .cpp files in a given folder where it is run.
 # Uses dependency files and stored .d and .o in $MAIN_OBJ_DIR folder
 # To add extra folders with .h or .cpp, define paths in variable $LIB_DIRS, as shown below
@@ -7,25 +7,19 @@
 ########## USER DEFINITIONS
 ##############################################################################################
 
-LIB_DIRS 	:= 	../../Game_Framework/Game_Framework \
-				../../Game_Framework/Game_Framework/sfml \
-				../../Game_Framework/Game_Framework/Tools\
-				../../Game_Framework/Game_Framework/holders \
-				../../Game_Framework/Game_Framework/gui \
-				../../Game_Framework \
-				../../GAcpp/NEAT/v2/Image \
-				../../GAcpp/NEAT/v2/Main \
-				../../GAcpp/GA/v3/GA
+LIB_DIRS 	:= 	../Lib
 				
-USER_FLAGS  := -Wall -Wextra -std=c++11 -Wno-unused-parameter -Wno-unused-function -fopenmp
+# USER_FLAGS  := -Wall -Wextra -std=c++11 -Wno-unused-parameter -Wno-unused-function -fopenmp -pthread
+USER_FLAGS  := -std=c++14 -Wno-unused-parameter -Wno-unused-function
 
 # ROOT_LD 	:= $(shell root-config --libs)
 # ROOT_CC 	:= $(shell root-config --cflags)
-SFML_LD 	:= -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio -L$(SFML_ROOT)/lib
-SFML_CC		:= -I$(SFML_ROOT)/include
+# SFML_ROOT must be defined on the user's machine
+# SFML_LD 	:= -ltgui -L$(TGUI_ROOT)/build/lib -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio -L$(SFML_ROOT)/lib
+# SFML_CC		:= -I$(SFML_ROOT)/include -I$(TGUI_ROOT)/include
 
 # VALGRIND	:= -g -O0
-VALGRIND	:= -O2
+VALGRIND	:= -O3
 
 ##############################################################################################
 ##############################################################################################
@@ -118,7 +112,7 @@ endif
 ifneq ($(or $(s), $(S), $(SFML)),)
 	@echo Compiled using SFML
 endif
-ifneq ($(or $(v), $(V), $(filter-out -O2,$(VALGRIND))),)
+ifneq ($(or $(v), $(V), $(filter-out -O3,$(VALGRIND))),)
 	@echo Compiled using VALGRIND
 endif
 

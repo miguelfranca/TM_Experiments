@@ -21,9 +21,9 @@ USER_FLAGS  := -Wall -Wextra -std=c++11 -Wno-unused-parameter -Wno-unused-functi
 
 # ROOT_LD 	:= $(shell root-config --libs)
 # ROOT_CC 	:= $(shell root-config --cflags)
-# SFML_PATH must be defined on the user's machine
-SFML_LD 	:= -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio -L$(SFML_PATH)/lib
-SFML_CC		:= -I$(SFML_PATH)/include
+# SFML_ROOT must be defined on the user's machine
+SFML_LD 	:= -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio -L$(SFML_ROOT)/lib
+SFML_CC		:= -I$(SFML_ROOT)/include
 
 # VALGRIND	:= -g -O0
 VALGRIND	:= -O2
