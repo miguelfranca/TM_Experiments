@@ -11,17 +11,20 @@ int main()
 	std::vector<Vec> img;
 	std::vector<Vec> l;
 
-	NeuralNetwork::split(images, labels, img, l, 0.60);
+	NeuralNetwork::split(images, labels, img, l, 0.50);
+
 
 	int inputs = 28 * 28;
 	int outputs = 10;
-	double lr = 0.01;
-	NeuralNetwork net(inputs, outputs, lr);
+	double learning_rate = 0.001;
+	NeuralNetwork net(inputs, outputs, learning_rate);
 	net.add(150);
 	net.add(30);
 
-	unsigned epochs = 20;
-	net.train(images, labels, img, l, epochs);
+	unsigned epochs = 100;
+	unsigned batchSize = 64;
+	net.train(images, labels, img, l, epochs, batchSize, NeuralNetwork::CROSS_ENTROPY);
+	// net.train(img, l, images, labels, epochs, batchSize, NeuralNetwork::CROSS_ENTROPY);
 
 	///////////////////////////////////////TRAINING SET///////////////////////////////////////////
 	unsigned start = 0;

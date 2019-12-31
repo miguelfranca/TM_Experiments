@@ -7,16 +7,18 @@
 ########## USER DEFINITIONS
 ##############################################################################################
 
-LIB_DIRS 	:= 	../Lib
+LIB_DIRS 	:= 	../Lib \
+				../../../Gnuplot
 				
 # USER_FLAGS  := -Wall -Wextra -std=c++11 -Wno-unused-parameter -Wno-unused-function -fopenmp -pthread
-USER_FLAGS  := -std=c++14 -Wno-unused-parameter -Wno-unused-function
+USER_FLAGS  := -std=c++14 -Wno-unused-parameter -Wno-unused-function 
 
 # ROOT_LD 	:= $(shell root-config --libs)
 # ROOT_CC 	:= $(shell root-config --cflags)
 # SFML_ROOT must be defined on the user's machine
 # SFML_LD 	:= -ltgui -L$(TGUI_ROOT)/build/lib -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio -L$(SFML_ROOT)/lib
 # SFML_CC		:= -I$(SFML_ROOT)/include -I$(TGUI_ROOT)/include
+GNUPLOT_LD  := -lutil -lboost_iostreams -lboost_system -lboost_filesystem
 
 # VALGRIND	:= -g -O0
 VALGRIND	:= -O3
@@ -97,7 +99,7 @@ LIBS_OBJ_FILES 	:= $(foreach file,$(LIBS_CPP_FILES), $(addprefix $(dir $(file)),
 LIBS_DEP_FILES 	:= $(subst .o,.d,$(LIBS_OBJ_FILES))
 #LIBS_OBJ_FILES - replace .cpp by .o and add bin/ before then basename (but after the lib path)
 
-LD_FLAGS := $(USER_FLAGS) $(VALGRIND) $(ROOT_LD) $(SFML_LD)
+LD_FLAGS := $(USER_FLAGS) $(VALGRIND) $(ROOT_LD) $(SFML_LD) $(GNUPLOT_LD)
 CC_FLAGS := $(USER_FLAGS) $(VALGRIND) $(ROOT_CD) $(SFML_CC) $(INCLUDES) -MMD
 
 $(EXECUTABLE): $(MAIN_OBJ_FILES) $(LIBS_OBJ_FILES)
