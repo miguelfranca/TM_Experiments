@@ -115,8 +115,8 @@ void NeuralNetwork::train(const std::vector<Vec>& inputsTrain, const std::vector
 
 		G.restart(false)
 		.setXRange(0., i + .5)
-		.add(errors_train, "Train", false, "blue", 3, true)
-		.add(errors_test,  "Test",  false, "red",  3, true)
+		.add(errors_train, "Train", false, "blue", 2, true)
+		.add(errors_test,  "Test",  false, "red",  2, true)
 		.plot();
 	}
 
@@ -126,8 +126,8 @@ void NeuralNetwork::train(const std::vector<Vec>& inputsTrain, const std::vector
 	errors_test.push_back({(real)epochs, current_loss_test});
 	G.restart(false)
 	.setXRange(0., epochs + .5)
-	.add(errors_train, "Train", false, "blue", 3, true)
-	.add(errors_test,  "Test",  false, "red",  3, true)
+	.add(errors_train, "Train", false, "blue", 2, true)
+	.add(errors_test,  "Test",  false, "red",  2, true)
 	.plot();
 }
 

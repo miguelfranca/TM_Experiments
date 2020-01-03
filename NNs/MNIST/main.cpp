@@ -21,7 +21,7 @@ int main()
 	net.add(150);
 	net.add(30);
 
-	unsigned epochs = 100;
+	unsigned epochs = 150;
 	unsigned batchSize = 64;
 	net.train(images, labels, img, l, epochs, batchSize, NeuralNetwork::CROSS_ENTROPY);
 	// net.train(img, l, images, labels, epochs, batchSize, NeuralNetwork::CROSS_ENTROPY);
