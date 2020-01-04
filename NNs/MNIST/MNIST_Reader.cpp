@@ -1,3 +1,4 @@
+#include "Instrumentor.h"
 #include "MNIST_Reader.hpp"
 #include <fstream>
 #include <iostream>
@@ -5,8 +6,9 @@
 namespace MNIST
 {
 
-	std::vector<Vec> getImages(std::string MNIST_Path)
+	std::vector<Vec> getImages(const std::string& MNIST_Path)
 	{
+		PROFILE_FUNCTION();
 
 		std::ifstream file(MNIST_Path + images_path, std::ios::in);
 
@@ -41,9 +43,9 @@ namespace MNIST
 		return imagesVec;
 	}
 
-	std::vector<Vec> getLabels(std::string MNIST_Path)
+	std::vector<Vec> getLabels(const std::string& MNIST_Path)
 	{
-
+		PROFILE_FUNCTION();
 
 		std::ifstream file(MNIST_Path + labels_path, std::ios::in);
 
@@ -70,7 +72,7 @@ namespace MNIST
 		return labelsVec;
 	}
 
-	void print(Vec& image)
+	void print(const Vec& image)
 	{
 		for (unsigned j = 0; j < 28; ++j) {
 			for (unsigned k = 0; k < 28; ++k)
@@ -80,7 +82,7 @@ namespace MNIST
 		}
 	}
 
-	void print(Vec& image, Vec& label)
+	void print(const Vec& image, const Vec& label)
 	{
 		for (unsigned j = 0; j < 28; ++j) {
 			for (unsigned k = 0; k < 28; ++k)
@@ -93,7 +95,7 @@ namespace MNIST
 			std::cout << i << ": " << label(i) << std::endl;
 	}
 
-	void print(std::vector<Vec>& images, std::vector<Vec>& labels, int n)
+	void print(const std::vector<Vec>& images, const std::vector<Vec>& labels, int n)
 	{
 		std::cout << "IMAGES: " << images.size() << std::endl;
 		std::cout << "LABELS: " << labels.size() << std::endl;

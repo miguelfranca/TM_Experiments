@@ -14,12 +14,12 @@ namespace MNIST
 		unsigned char data;
 	};
 
-	std::vector<Vec> getImages(std::string MNIST_Path = "./");
-	std::vector<Vec> getLabels(std::string MNIST_Path = "./");
+	std::vector<Vec> getImages(const std::string& MNIST_Path = "./");
+	std::vector<Vec> getLabels(const std::string& MNIST_Path = "./");
 
-	void print(Vec& image);
-	void print(Vec& image, Vec& label);
-	void print(std::vector<Vec>& images, std::vector<Vec>& labels, int n = -1);
+	void print(const Vec& image);
+	void print(const Vec& image, const Vec& label);
+	void print(const std::vector<Vec>& images, const std::vector<Vec>& labels, int n = -1);
 
 	static const std::string images_path = "train-images-idx3-ubyte.dat";
 	static const std::string labels_path = "train-labels-idx1-ubyte.dat";

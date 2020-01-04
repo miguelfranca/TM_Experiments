@@ -37,8 +37,9 @@ private:
 	static Vec calculateLastDelta_CE(const Vec& output, const Layer& lastL);
 	static real calculateLoss_CE(const Vec& x, const Vec& ouput);
 
-	real calculateTotalLoss(const std::vector<Vec>& inputs,
-	                        const std::vector<Vec>& outputs, LossFunction loss);
+	// outputs error and std.dev (to each side)
+	std::vector<real> calculateTotalLoss(const std::vector<Vec>& inputs,
+	        const std::vector<Vec>& outputs, LossFunction loss);
 
 private:
 	std::vector<Layer> L;

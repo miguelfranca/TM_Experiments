@@ -23,7 +23,6 @@ public:
 	Layer(unsigned inputSize, unsigned outputSize, Activation a = SIGMOID);
 	~Layer();
 
-	const Vec& forwardProp(const Vec& input);
 	void backProp(Vec& next, const Vec& prevX);
 	void backProp(Vec& next, const Vec& prevX, const Vec& delta);
 
@@ -35,6 +34,7 @@ public:
 	inline FuncD getCalculateDelta() const { return calculateDelta[func]; }
 
 private:
+	void forwardProp(const Vec& input);
 	void resetGrads();
 
 private:

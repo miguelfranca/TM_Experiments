@@ -2,9 +2,11 @@
 #include <ctime>
 #include "NeuralNetwork.hpp"
 #include "MNIST_Reader.hpp"
+#include "Instrumentor.h"
 
 int main()
 {
+	BEGIN_PROFILING("MNIST", "MNIST_PROFILING.json");
 
 	std::vector<Vec> images = MNIST::getImages();
 	std::vector<Vec> labels = MNIST::getLabels();
@@ -21,10 +23,13 @@ int main()
 	net.add(150);
 	net.add(30);
 
-	unsigned epochs = 150;
-	unsigned batchSize = 64;
+	unsigned epochs = 50;
+	unsigned batchSize = 44;
+	// net.train(images, labels, img, l, epochs, batchSize);
 	net.train(images, labels, img, l, epochs, batchSize, NeuralNetwork::CROSS_ENTROPY);
 	// net.train(img, l, images, labels, epochs, batchSize, NeuralNetwork::CROSS_ENTROPY);
+
+	END_PROFILING("MNIST");
 
 	///////////////////////////////////////TRAINING SET///////////////////////////////////////////
 	unsigned start = 0;
@@ -92,5 +97,6 @@ int main()
 	std::cout << "WRONG: " << wrong_training + wrong_test << std::endl;
 	std::cout << "PERC: " << (double)(right_training + right_test) / (right_training + right_test +
 	          wrong_training + wrong_test) * 100. << "%" << std::endl;
+
 	return 0;
 }

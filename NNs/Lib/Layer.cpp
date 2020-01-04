@@ -1,5 +1,6 @@
 #include <cassert>
 #include "Layer.hpp"
+#include "Instrumentor.h"
 
 Func Layer::activations[] 		= { Layer::sigmoidV, Layer::crossEntropyV } ;
 FuncD Layer::calculateDelta[] 	= { Layer::calculateDelta_sigmoid, Layer::calculateDelta_crossEntropy };
@@ -20,32 +21,36 @@ Layer::~Layer()
 
 void Layer::resetGrads()
 {
+	PROFILE_FUNCTION();
 	gradW = Mat::Zero(outputs(), inputs());
 	gradb = Vec::Zero(outputs());
 }
 
 void Layer::addGrads(real learningRate)
 {
+	PROFILE_FUNCTION();
 	W -= learningRate * gradW;
 	b -= learningRate * gradb;
 	resetGrads();
 }
 
-const Vec& Layer::forwardProp(const Vec& input)
+void Layer::forwardProp(const Vec& input)
 {
+	PROFILE_FUNCTION();
 	z = W * input + b;
 	activations[func](z, x);
-	return x;
 }
 
 void Layer::backProp(Vec& next, const Vec& prevX)
 {
+	PROFILE_FUNCTION();
 	Vec delta = calculateDelta[func](next, x, z);
 	backProp(next, prevX, delta);
 }
 
 void Layer::backProp(Vec& next, const Vec& prevX, const Vec& delta)
 {
+	PROFILE_FUNCTION();
 	next = (delta.transpose() * W).transpose();
 	gradW += (delta * prevX.transpose());
 	gradb += delta;
