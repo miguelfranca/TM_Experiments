@@ -5,27 +5,32 @@
 #include "NeuralNetwork.hpp"
 #include "Graphics.hpp"
 #include "Instrumentor.h"
+#include "Clock.hpp"
+
+using namespace NN;
 
 FuncLastD NeuralNetwork::calculateLastDelta[] = { NeuralNetwork::calculateLastDelta_MSE, NeuralNetwork::calculateLastDelta_CE };
 FuncLoss NeuralNetwork::calculateLoss[] = { NeuralNetwork::calculateLoss_MSE, NeuralNetwork::calculateLoss_CE };
 
-NeuralNetwork::NeuralNetwork(unsigned a_inputSize, unsigned a_outputSize, real a_learningRate)
-	: inputSize(a_inputSize), outputSize(a_outputSize), learningRate(a_learningRate)
+NeuralNetwork::NeuralNetwork(unsigned a_inputSize, unsigned a_outputSize, GDMethod::Type a_gd_t,
+                             real a_learningRate, int srand_seed)
+	: gd_t(a_gd_t), inputSize(a_inputSize), outputSize(a_outputSize), learningRate(a_learningRate)
 {
 	PROFILE_FUNCTION();
-	std::srand(std::time(nullptr) + clock());
+	std::srand(srand_seed < 0 ? std::time(nullptr) + clock() : srand_seed); // for Eigen::Random to work
 }
 
 NeuralNetwork::~NeuralNetwork()
 {
-
+	for (unsigned i = 0; i < L.size(); ++i)
+		delete L[i].gd;
 }
 
 void NeuralNetwork::add(unsigned layerSize, Layer::Activation a)
 {
 	PROFILE_FUNCTION();
 	unsigned in = (L.size() == 0 ? inputSize : L.back().outputs());
-	L.push_back(Layer(in, layerSize, a));
+	L.push_back(Layer(in, layerSize, makeGDMethod(), a));
 }
 
 void NeuralNetwork::backProp(const Vec* inputs, const Vec* outputs, unsigned batchSize,
@@ -48,7 +53,7 @@ void NeuralNetwork::backProp(const Vec* inputs, const Vec* outputs, unsigned bat
 	}
 
 	for (unsigned i = 0; i < L.size(); ++i)
-		L[i].addGrads(learningRate);
+		L[i].addGrads();
 }
 
 Vec NeuralNetwork::forwardProp(const Vec& input)
@@ -86,7 +91,13 @@ void NeuralNetwork::train(const std::vector<Vec>& inputsTrain, const std::vector
 {
 	PROFILE_FUNCTION();
 	unsigned in = (L.size() == 0 ? inputSize : L.back().outputs());
-	L.push_back(Layer(in, outputSize, (loss == CROSS_ENTROPY ? Layer::SOFTMAX : Layer::SIGMOID)));
+	L.push_back(
+	    Layer(in, outputSize,
+	          makeGDMethod(),
+	          (loss == CROSS_ENTROPY ? Layer::SOFTMAX : Layer::SIGMOID)
+	         )
+	);
+
 
 	std::vector<std::vector<real>> errors_train;
 	std::vector<std::vector<real>> errors_test;
@@ -100,10 +111,19 @@ void NeuralNetwork::train(const std::vector<Vec>& inputsTrain, const std::vector
 	std::cout << "Train on " << inputsTrain.size() << " samples, validate on " << inputsTest.size() <<
 	          " samples." << std::endl;
 
+	Clock C_total("", Clock::stop);
+	C_total.setVerbose(false);
+
+	Clock C("", Clock::stop);
+	C.setVerbose(false);
+
+	C_total();
 	for (unsigned i = 1; i <= epochs; ++i) {
+		C();
 		std::cout << "EPOCH: " << i << "/" << epochs << std::endl;
 
 		unsigned j, tot = inputsTrain.size() - inputsTrain.size() % batchSize;
+
 
 		for (j = 0; j < tot; j += batchSize)
 			backProp(inputsTrain.data() + j, outputsTrain.data() + j, batchSize, loss);
@@ -111,14 +131,20 @@ void NeuralNetwork::train(const std::vector<Vec>& inputsTrain, const std::vector
 		if (j < inputsTrain.size())
 			backProp(inputsTrain.data() + j, outputsTrain.data() + j, inputsTrain.size() - j, loss);
 
+		double t = C();
+		C();
+
 		auto current_loss_train = calculateTotalLoss(inputsTrain, outputsTrain, loss);
 		auto current_loss_test = calculateTotalLoss(inputsTest, outputsTest, loss);
 
-		std::cout << std::setprecision(2);
+		double t2 = C();
+
+		std::cout << std::setprecision(3);
 		std::cout << "Loss: " << current_loss_train[0]
 		          << "(" << current_loss_train[1] << "," << current_loss_train[2] << ")"
 		          << ", Val.Loss: " << current_loss_test[0]
 		          << "(" << current_loss_test[1] << "," << current_loss_test[2] << ")"
+		          << ", BackProp.Time: " << t << "s, TotalLossTime: " << t2 << "s"
 		          << std::endl;
 
 		errors_train.push_back({(real)i, current_loss_train[0], current_loss_train[1], current_loss_train[2]});
@@ -132,9 +158,10 @@ void NeuralNetwork::train(const std::vector<Vec>& inputsTrain, const std::vector
 		.add(errors_test,  "Test",  "red",  0, false, false)	// draw error bars
 		.plot();
 	}
-}
 
-// #include "MNIST_Reader.hpp"
+	double t = C_total();
+	std::cout << "Optimization finished. Total Time: " << t << "s" << std::endl;
+}
 
 std::vector<real> NeuralNetwork::calculateTotalLoss(const std::vector<Vec>& inputs,
         const std::vector<Vec>& outputs, LossFunction loss)
@@ -147,11 +174,11 @@ std::vector<real> NeuralNetwork::calculateTotalLoss(const std::vector<Vec>& inpu
 	for (unsigned i = 0; i < outputs.size(); ++i) {
 		forwardProp(inputs[i]);
 		all_err[i] = calculateLoss[loss](L.back().x, outputs[i]);
-/*		if(all_err[i]>3){
-			std::cout << "Point " << i << " bigger than 2: " << all_err[i] << " ==> " << std::exp(-all_err[i]) << std::endl;
-			MNIST::print(Vec(inputs[i]));
-			std::cout << L.back().x << " && " << outputs[i] << std::endl;
-		}*/
+		/*		if(all_err[i]>3){
+					std::cout << "Point " << i << " bigger than 2: " << all_err[i] << " ==> " << std::exp(-all_err[i]) << std::endl;
+					MNIST::print(Vec(inputs[i]));
+					std::cout << L.back().x << " && " << outputs[i] << std::endl;
+				}*/
 		average  += all_err[i];
 	}
 
@@ -222,3 +249,24 @@ Vec NeuralNetwork::calculateLastDelta_CE(const Vec& output, const Layer& lastL)
 	return lastL.getCalculateDelta()(send, lastL.x, lastL.z);
 }
 
+GDMethod* NeuralNetwork::makeGDMethod()
+{
+	GDMethod* gd = nullptr;
+
+	switch (gd_t) {
+		case GDMethod::GRADIENT_DESCENT:
+			gd = new GradientDescent(learningRate);
+			break;
+
+		case GDMethod::ADAM:
+			gd = new Adam(learningRate);
+			break;
+
+		default:
+			std::cerr << "GDMethod not defiend yet. Code incomplete." << std::endl;
+			assert(false); // give error
+			break;
+	}
+
+	return gd;
+}

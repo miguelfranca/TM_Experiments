@@ -1,22 +1,29 @@
 #include <cassert>
 #include "Layer.hpp"
 #include "Instrumentor.h"
+#include <iostream>
+
+using namespace NN;
 
 Func Layer::activations[] 		= { Layer::sigmoidV, Layer::crossEntropyV } ;
 FuncD Layer::calculateDelta[] 	= { Layer::calculateDelta_sigmoid, Layer::calculateDelta_crossEntropy };
 
 std::pointer_to_unary_function<real, real> Layer::sigmoid_ptr = std::ptr_fun(sigmoid);
 
-Layer::Layer(unsigned inputSize, unsigned outputSize, Activation a) : x(outputSize),
-	z(outputSize), W(Mat::Random(outputSize, inputSize)),
-	b(Vec::Random(outputSize)), func(a)
+Layer::Layer(unsigned inputSize, unsigned outputSize, GDMethod* a_gd, Activation a) :
+	func(a),
+	x(outputSize),
+	z(outputSize),
+	W(Mat::Random(outputSize, inputSize)),
+	b(Vec::Random(outputSize)),
+	gd(a_gd)
 {
 	resetGrads();
+	gd->setLayer(*this);
 }
 
 Layer::~Layer()
 {
-
 }
 
 void Layer::resetGrads()
@@ -26,11 +33,10 @@ void Layer::resetGrads()
 	gradb = Vec::Zero(outputs());
 }
 
-void Layer::addGrads(real learningRate)
+void Layer::addGrads()
 {
 	PROFILE_FUNCTION();
-	W -= learningRate * gradW;
-	b -= learningRate * gradb;
+	gd->updateGrads(*this);
 	resetGrads();
 }
 

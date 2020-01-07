@@ -8,10 +8,12 @@
 ##############################################################################################
 
 LIB_DIRS 	:= 	../Lib \
+				../Tools \
 				../../../Gnuplot
 				
 # USER_FLAGS  := -Wall -Wextra -std=c++11 -Wno-unused-parameter -Wno-unused-function -fopenmp -pthread
 # USER_FLAGS  := -std=c++14 -Wno-unused-parameter -Wno-unused-function -DPROFILING
+# USER_FLAGS  := -std=c++14 -Wno-unused-parameter -Wno-unused-function -DEIGEN_NO_DEBUG
 USER_FLAGS  := -std=c++14 -Wno-unused-parameter -Wno-unused-function
 
 # ROOT_LD 	:= $(shell root-config --libs)

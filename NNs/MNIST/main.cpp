@@ -13,20 +13,21 @@ int main()
 	std::vector<Vec> img;
 	std::vector<Vec> l;
 
-	NeuralNetwork::split(images, labels, img, l, 0.50);
+	NN::NeuralNetwork::split(images, labels, img, l, 0.50);
 
-
-	int inputs = 28 * 28;
-	int outputs = 10;
 	double learning_rate = 0.001;
-	NeuralNetwork net(inputs, outputs, learning_rate);
+
+	int inputs  = images[0].size();
+	int outputs = labels[0].size();
+	NN::NeuralNetwork net(inputs, outputs, NN::GDMethod::GRADIENT_DESCENT, learning_rate, 12);
+	// NN::NeuralNetwork net(inputs, outputs, NN::GDMethod::ADAM, learning_rate, 12);
 	net.add(150);
 	net.add(30);
 
-	unsigned epochs = 50;
-	unsigned batchSize = 44;
+	unsigned epochs = 20;
+	unsigned batchSize = 64;
 	// net.train(images, labels, img, l, epochs, batchSize);
-	net.train(images, labels, img, l, epochs, batchSize, NeuralNetwork::CROSS_ENTROPY);
+	net.train(images, labels, img, l, epochs, batchSize, NN::NeuralNetwork::CROSS_ENTROPY);
 	// net.train(img, l, images, labels, epochs, batchSize, NeuralNetwork::CROSS_ENTROPY);
 
 	END_PROFILING("MNIST");
@@ -41,8 +42,8 @@ int main()
 	for (unsigned i = start; i < finnish; ++i) {
 		Vec::Index guess;
 		net.forwardProp(images[i]).maxCoeff(&guess);
-		MNIST::print(images[i]);
-		std::cout << guess << std::endl;
+		// MNIST::print(images[i]);
+		// std::cout << guess << std::endl;
 
 		int correct;
 
@@ -65,8 +66,8 @@ int main()
 	for (unsigned i = start; i < finnish; ++i) {
 		Vec::Index guess;
 		net.forwardProp(img[i]).maxCoeff(&guess);
-		MNIST::print(img[i]);
-		std::cout << guess << std::endl;
+		// MNIST::print(img[i]);
+		// std::cout << guess << std::endl;
 
 		int correct;
 
