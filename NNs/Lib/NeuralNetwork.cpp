@@ -14,7 +14,8 @@ FuncLoss NeuralNetwork::calculateLoss[] = { NeuralNetwork::calculateLoss_MSE, Ne
 
 NeuralNetwork::NeuralNetwork(unsigned a_inputSize, unsigned a_outputSize, GDMethod::Type a_gd_t,
                              real a_learningRate, int srand_seed)
-	: gd_t(a_gd_t), inputSize(a_inputSize), outputSize(a_outputSize), learningRate(a_learningRate)
+	: gd_t(a_gd_t), inputSize(a_inputSize), outputSize(a_outputSize), learningRate(a_learningRate),
+	  act_last_layer(Layer::UNDEFINED)
 {
 	PROFILE_FUNCTION();
 	std::srand(srand_seed < 0 ? std::time(nullptr) + clock() : srand_seed); // for Eigen::Random to work
@@ -87,14 +88,26 @@ void NeuralNetwork::split(std::vector<Vec>& inputsTrain, std::vector<Vec>& outpu
 
 void NeuralNetwork::train(const std::vector<Vec>& inputsTrain, const std::vector<Vec>& outputsTrain,
                           const std::vector<Vec>& inputsTest,  const std::vector<Vec>& outputsTest,
-                          unsigned epochs, unsigned batchSize, LossFunction loss)
+                          unsigned epochs, unsigned batchSize, LossFunction loss,
+                          bool calculate_categorical_accucary)
 {
 	PROFILE_FUNCTION();
 	unsigned in = (L.size() == 0 ? inputSize : L.back().outputs());
+
+	Layer::Activation act = act_last_layer;
+
+	if (act == Layer::UNDEFINED)
+		act = (loss == CROSS_ENTROPY ? Layer::SOFTMAX : Layer::SIGMOID);
+
+	if (act != Layer::SOFTMAX && loss == CROSS_ENTROPY) {
+		std::cerr << "WARNING: using Cross Entropy Loss function in a layer" <<
+		          "without SOFTMAX activation for probability normalization" << std::endl;
+	}
+
 	L.push_back(
 	    Layer(in, outputSize,
 	          makeGDMethod(),
-	          (loss == CROSS_ENTROPY ? Layer::SOFTMAX : Layer::SIGMOID)
+	          act
 	         )
 	);
 
@@ -102,11 +115,18 @@ void NeuralNetwork::train(const std::vector<Vec>& inputsTrain, const std::vector
 	std::vector<std::vector<real>> errors_train;
 	std::vector<std::vector<real>> errors_test;
 
+	std::vector<std::vector<real>> accuracy_train;
+	std::vector<std::vector<real>> accuracy_test;
+
 	Graphics G;
-	G.setTitle("LOSS vs EPOCHS")
+	G.setTitle("LOSS/ACCURACY vs EPOCHS")
 	.setYLabel("Loss")
 	.setXLabel("Epochs")
-	.setLMargin(10);
+	.setLMargin(10)
+	.plotTo2ndAxis(true, 5)
+	.setYLabel("Accuracy (%)")
+	.setTextSize(10)
+	.plotTo2ndAxis(false);
 
 	std::cout << "Train on " << inputsTrain.size() << " samples, validate on " << inputsTest.size() <<
 	          " samples." << std::endl;
@@ -118,6 +138,7 @@ void NeuralNetwork::train(const std::vector<Vec>& inputsTrain, const std::vector
 	C.setVerbose(false);
 
 	C_total();
+
 	for (unsigned i = 1; i <= epochs; ++i) {
 		C();
 		std::cout << "EPOCH: " << i << "/" << epochs << std::endl;
@@ -134,8 +155,10 @@ void NeuralNetwork::train(const std::vector<Vec>& inputsTrain, const std::vector
 		double t = C();
 		C();
 
-		auto current_loss_train = calculateTotalLoss(inputsTrain, outputsTrain, loss);
-		auto current_loss_test = calculateTotalLoss(inputsTest, outputsTest, loss);
+		auto current_loss_train = calculateTotalLoss(inputsTrain, outputsTrain, loss,
+		                          calculate_categorical_accucary);
+		auto current_loss_test  = calculateTotalLoss(inputsTest,  outputsTest,  loss,
+		                          calculate_categorical_accucary);
 
 		double t2 = C();
 
@@ -143,20 +166,36 @@ void NeuralNetwork::train(const std::vector<Vec>& inputsTrain, const std::vector
 		std::cout << "Loss: " << current_loss_train[0]
 		          << "(" << current_loss_train[1] << "," << current_loss_train[2] << ")"
 		          << ", Val.Loss: " << current_loss_test[0]
-		          << "(" << current_loss_test[1] << "," << current_loss_test[2] << ")"
-		          << ", BackProp.Time: " << t << "s, TotalLossTime: " << t2 << "s"
+		          << "(" << current_loss_test[1] << "," << current_loss_test[2] << ")";
+
+		if (calculate_categorical_accucary)
+			std::cout << ", Acc.: " << current_loss_train[3]
+			          << ", Val.Acc.: " << current_loss_test[3];
+
+		std::cout << ", BackProp.Time: " << t << "s, TotalLossTime: " << t2 << "s"
 		          << std::endl;
 
 		errors_train.push_back({(real)i, current_loss_train[0], current_loss_train[1], current_loss_train[2]});
 		errors_test.push_back({(real)i, current_loss_test[0],  current_loss_test[1],  current_loss_test[2]});
 
 		G.restart(false)
-		.setXRange(0., i + .5)
+		.setXRange(0., (i + .5) * 1.4) // "*1.4" to leave space for the legend
 		.add(errors_train, "", 		"blue", 2)					// draw lines
-		.add(errors_train, "Train", "blue", 0, false, false)	// draw error bars
+		.add(errors_train, "Train Loss", "blue", 0, false, false)	// draw error bars
 		.add(errors_test,  "",  	"red",  2)					// draw lines
-		.add(errors_test,  "Test",  "red",  0, false, false)	// draw error bars
-		.plot();
+		.add(errors_test,  "Test Loss",  "red",  0, false, false);	// draw error bars
+
+		if (calculate_categorical_accucary) {
+			accuracy_train.push_back({(real)i, current_loss_train[3]});
+			accuracy_test.push_back({(real)i, current_loss_test[3]});
+
+			G.plotTo2ndAxis(true)
+			.add(accuracy_train, "Train Acc.", "green", 2, true)	// draw lines
+			.add(accuracy_test,  "Test Acc.",  "orange",  2, true)	// draw lines
+			.plotTo2ndAxis(false);
+		}
+
+		G.plot();
 	}
 
 	double t = C_total();
@@ -164,22 +203,23 @@ void NeuralNetwork::train(const std::vector<Vec>& inputsTrain, const std::vector
 }
 
 std::vector<real> NeuralNetwork::calculateTotalLoss(const std::vector<Vec>& inputs,
-        const std::vector<Vec>& outputs, LossFunction loss)
+        const std::vector<Vec>& outputs, LossFunction loss,
+        bool calculate_categorical_accucary)
 {
 	PROFILE_FUNCTION();
 	real average  = 0.;
 	std::vector<real> all_err(outputs.size());
 	real error2 = 0.;
 
+	unsigned accuracy = 0;
+
 	for (unsigned i = 0; i < outputs.size(); ++i) {
 		forwardProp(inputs[i]);
 		all_err[i] = calculateLoss[loss](L.back().x, outputs[i]);
-		/*		if(all_err[i]>3){
-					std::cout << "Point " << i << " bigger than 2: " << all_err[i] << " ==> " << std::exp(-all_err[i]) << std::endl;
-					MNIST::print(Vec(inputs[i]));
-					std::cout << L.back().x << " && " << outputs[i] << std::endl;
-				}*/
 		average  += all_err[i];
+
+		if (calculate_categorical_accucary)
+			accuracy += categorical_accucary(L.back().x, outputs[i]);
 	}
 
 	average  /= outputs.size();
@@ -204,6 +244,9 @@ std::vector<real> NeuralNetwork::calculateTotalLoss(const std::vector<Vec>& inpu
 
 	stddev_minus = sqrt(stddev_minus / N_minus);
 	stddev_plus  = sqrt(stddev_plus / N_plus);
+
+	if (calculate_categorical_accucary)
+		return {average, stddev_minus, stddev_plus, 100. * accuracy / outputs.size()};
 
 	return {average, stddev_minus, stddev_plus};
 }
@@ -269,4 +312,20 @@ GDMethod* NeuralNetwork::makeGDMethod()
 	}
 
 	return gd;
+}
+
+
+void NeuralNetwork::setActivationLastLayer(Layer::Activation a)
+{
+	act_last_layer = a;
+}
+
+
+bool NeuralNetwork::categorical_accucary(const Vec& x, const Vec& output)
+{
+	Vec::Index guess_x, guess_o;
+	x.maxCoeff(&guess_x);
+	output.maxCoeff(&guess_o);
+
+	return guess_x == guess_o;
 }

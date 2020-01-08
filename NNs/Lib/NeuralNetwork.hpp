@@ -33,7 +33,9 @@ namespace NN
 		void train(const std::vector<Vec>& inputsTrain, const std::vector<Vec>& outputsTrain,
 		           const std::vector<Vec>& inputTests,
 		           const std::vector<Vec>& outputTests, unsigned epochs, unsigned batchSize = 1,
-		           LossFunction loss = MSE);
+		           LossFunction loss = MSE, bool calculate_categorical_accucary = false);
+
+		void setActivationLastLayer(Layer::Activation a);
 
 	private:
 		void backProp(const Vec* inputs, const Vec* outputs, unsigned batchSize, LossFunction loss);
@@ -46,9 +48,12 @@ namespace NN
 
 		// outputs error and std.dev (to each side)
 		std::vector<real> calculateTotalLoss(const std::vector<Vec>& inputs,
-		                                     const std::vector<Vec>& outputs, LossFunction loss);
+		                                     const std::vector<Vec>& outputs, LossFunction loss,
+		                                     bool calculate_categorical_accucary);
 
 		GDMethod* makeGDMethod();
+
+		bool categorical_accucary(const Vec& x, const Vec& output);
 
 	private:
 		std::vector<Layer> L;
@@ -58,6 +63,8 @@ namespace NN
 		const unsigned outputSize;
 
 		const real learningRate;
+
+		Layer::Activation act_last_layer;
 
 	private:
 		static FuncLastD calculateLastDelta[];

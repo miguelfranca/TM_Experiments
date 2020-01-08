@@ -19,7 +19,8 @@ namespace NN
 
 		enum Activation {
 			SIGMOID,
-			SOFTMAX
+			SOFTMAX,
+			UNDEFINED
 		};
 
 	public:

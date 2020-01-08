@@ -26,9 +26,9 @@ int main()
 
 	unsigned epochs = 20;
 	unsigned batchSize = 64;
-	// net.train(images, labels, img, l, epochs, batchSize);
-	net.train(images, labels, img, l, epochs, batchSize, NN::NeuralNetwork::CROSS_ENTROPY);
-	// net.train(img, l, images, labels, epochs, batchSize, NeuralNetwork::CROSS_ENTROPY);
+	// net.train(images, labels, img, l, epochs, batchSize, NN:NeuralNetwrok::MSE, true);
+	net.train(images, labels, img, l, epochs, batchSize, NN::NeuralNetwork::CROSS_ENTROPY, true);
+	// net.train(img, l, images, labels, epochs, batchSize, NN::NeuralNetwork::CROSS_ENTROPY, true);
 
 	END_PROFILING("MNIST");
 
