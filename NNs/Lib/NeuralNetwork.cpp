@@ -122,14 +122,19 @@ void NeuralNetwork::train(const std::vector<Vec>& inputsTrain, const std::vector
 	G.setTitle("LOSS/ACCURACY vs EPOCHS")
 	.setYLabel("Loss")
 	.setXLabel("Epochs")
-	.setLMargin(10)
-	.plotTo2ndAxis(true, 5)
-	.setYLabel("Accuracy (%)")
-	.setTextSize(10)
-	.plotTo2ndAxis(false);
+	.setLMargin(10);
+
+	if (calculate_categorical_accucary)
+		G.plotTo2ndAxis(true, 10)
+		.setYLabel("Accuracy (%)")
+		.setYRange(0., 100.)
+		.setTextSize(10)
+		.plotTo2ndAxis(false);
 
 	std::cout << "Train on " << inputsTrain.size() << " samples, validate on " << inputsTest.size() <<
 	          " samples." << std::endl;
+
+	real max_loss = -1.;
 
 	Clock C_total("", Clock::stop);
 	C_total.setVerbose(false);
@@ -175,11 +180,15 @@ void NeuralNetwork::train(const std::vector<Vec>& inputsTrain, const std::vector
 		std::cout << ", BackProp.Time: " << t << "s, TotalLossTime: " << t2 << "s"
 		          << std::endl;
 
+		max_loss = std::max(std::max(max_loss, current_loss_train[0] + current_loss_train[2]),
+		                    current_loss_test[0] + current_loss_test[2]);
+
 		errors_train.push_back({(real)i, current_loss_train[0], current_loss_train[1], current_loss_train[2]});
 		errors_test.push_back({(real)i, current_loss_test[0],  current_loss_test[1],  current_loss_test[2]});
 
 		G.restart(false)
 		.setXRange(0., (i + .5) * 1.4) // "*1.4" to leave space for the legend
+		.setYRange(0., max_loss * 1.1) // "*1.1" just for scale
 		.add(errors_train, "", 		"blue", 2)					// draw lines
 		.add(errors_train, "Train Loss", "blue", 0, false, false)	// draw error bars
 		.add(errors_test,  "",  	"red",  2)					// draw lines
