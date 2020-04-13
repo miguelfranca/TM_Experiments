@@ -1,0 +1,34 @@
+Comments on neural network:
+
+ - don't forget to allow for some sort of input normalization
+ - cross validation (can be used to estimate the error of the network by the variance of each k-fold cross)
+ - AdaBoost - Julia slides
+ - try MNIST with normalization [-1,1] instead [0,1]
+ - stochastic sampling
+ - conjugate gradient descent
+ - threshold on relative difference between training and validation loss
+ - terminate when the total loss of an epoch stops changing (can be done by evaluating the total gradient of the loss of the relative change between epochs)
+ - recall that dropout is only used during training - fully active when predicting for validation
+ - add MSE with L1 or L2 regularization (sum of abs of all NN weights)
+
+####################################################################
+
+Learnings:
+1) if the model has 'p' free parameters, normalize the estimator of the variance not by N/(N-1) always, but by N/(N-p), p
+(https://stats.stackexchange.com/questions/20227/why-is-rss-distributed-chi-square-times-n-p)
+
+2) the average of random variables has a variance equal to the 1/N times the average of the variances. BUT, a variable sampled from an average of distributions (averaging the distributions and not the variables that came from independent distributions) is the mean of the variances (of each distribution) plus the variance of the means (of each distribution)
+(https://stats.stackexchange.com/questions/16608/what-is-the-variance-of-the-weighted-mixture-of-two-gaussians)
+
+3) Error Estimation:
+(from paper 'Neural network predictions with error bars')
+
+ - Estimate the variance of the model due to training by training a committee of NNs and calculating the variance of their predictions
+ One can weigth the several members of the committee not equally, but by 1/e^2, e^2 being the total loss error of prediction
+
+ - Estimate the noise of the input and target by training a separete NN to predict the model squared error
+
+ - Estimate the variance of the model due to data by a ... complicate process that involves Hessian and is bad for large Networks.
+ Idea: what if I activate the dropout layers several times and use this as an ensemble of predictions? Will this work? Will the average of these predictions match the prediction without dropout?
+
+ Final variance = sum variances
