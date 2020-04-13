@@ -2,6 +2,8 @@
 #include <ctime>
 #include <cmath>
 #include <iostream>
+#include <fstream>
+
 #include "NeuralNetwork.hpp"
 #include "Graphics.hpp"
 #include "Instrumentor.h"
@@ -337,4 +339,18 @@ bool NeuralNetwork::categorical_accucary(const Vec& x, const Vec& output)
 	output.maxCoeff(&guess_o);
 
 	return guess_x == guess_o;
+}
+
+
+void NeuralNetwork::saveToFile(const std::string& file)
+{
+	std::ofstream file(file);
+	file.write(reinterpret_cast<char*>(&inputs), sizeof(inputs));
+	file.write(reinterpret_cast<char*>(&inputs), sizeof(inputs));
+	file.write(reinterpret_cast<char*>(&inputs), sizeof(outputs));
+}
+
+void NeuralNetwork::loadFromFile(const std::string& file)
+{
+
 }

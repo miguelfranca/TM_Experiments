@@ -10,7 +10,8 @@ namespace NN
 
 		enum Type {
 			GRADIENT_DESCENT,
-			ADAM
+			ADAM,
+			UNDEFINED
 		};
 
 		virtual void setLayer(const Layer&) = 0;

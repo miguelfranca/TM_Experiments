@@ -19,10 +19,10 @@ int main()
 
 	int inputs  = images[0].size();
 	int outputs = labels[0].size();
-	NN::NeuralNetwork net(inputs, outputs, NN::GDMethod::GRADIENT_DESCENT, learning_rate, 12);
-	// NN::NeuralNetwork net(inputs, outputs, NN::GDMethod::ADAM, learning_rate, 12);
-	net.add(150);
-	net.add(30);
+	// NN::NeuralNetwork net(inputs, outputs, NN::GDMethod::GRADIENT_DESCENT, learning_rate, 12);
+	NN::NeuralNetwork net(inputs, outputs, NN::GDMethod::ADAM, learning_rate, 12);
+	net.add(150, NN::Layer::RELU);
+	net.add(30, NN::Layer::RELU);
 
 	unsigned epochs = 20;
 	unsigned batchSize = 64;
@@ -93,6 +93,7 @@ int main()
 	std::cout << "WRONG: " << wrong_test << std::endl;
 	std::cout << "PERC: " << (double)right_test / (right_test + wrong_test) * 100. << "%" << std::endl;
 
+	std::cout << std::endl;
 	std::cout << "ALL" << std::endl;
 	std::cout << "RIGHT: " << right_training + right_test << std::endl;
 	std::cout << "WRONG: " << wrong_training + wrong_test << std::endl;

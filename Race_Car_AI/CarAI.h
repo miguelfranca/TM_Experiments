@@ -89,6 +89,7 @@ public:
 	bool onDraw() override;
 
 	void onDestroy();
+	void onSwitch(std::string) override{}
 
 private:
 	void reset();

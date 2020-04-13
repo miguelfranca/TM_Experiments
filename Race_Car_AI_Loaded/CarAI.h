@@ -41,6 +41,8 @@ public:
 
 	void onDestroy();
 
+	void onSwitch(std::string) {}
+
 private:
 	void reset();
 

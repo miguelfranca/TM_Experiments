@@ -18,8 +18,13 @@ namespace NN
 
 
 
-		NeuralNetwork(unsigned inputSize, unsigned outputSize, GDMethod::Type a_gd = GDMethod::GRADIENT_DESCENT,
+		NeuralNetwork(unsigned inputSize, unsigned outputSize,
+		              GDMethod::Type a_gd = GDMethod::GRADIENT_DESCENT,
 		              real learningRate = 0.001, int srand_seed = -1);
+
+		NeuralNetwork(const std::string& file) : gd_t(GDMethod::UNDEFINED), inputSize(0),
+			outputSize(0), learningRate(0.),
+			act_last_layer(Layer::UNDEFINED) { loadFromFile(file); }
 
 		~NeuralNetwork();
 
@@ -36,6 +41,9 @@ namespace NN
 		           LossFunction loss = MSE, bool calculate_categorical_accucary = false);
 
 		void setActivationLastLayer(Layer::Activation a);
+
+		void saveToFile(const std::string& file);
+		void loadFromFile(const std::string& file);
 
 	private:
 		void backProp(const Vec* inputs, const Vec* outputs, unsigned batchSize, LossFunction loss);

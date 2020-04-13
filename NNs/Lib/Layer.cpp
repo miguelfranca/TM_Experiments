@@ -5,10 +5,11 @@
 
 using namespace NN;
 
-Func Layer::activations[] 		= { Layer::sigmoidV, Layer::crossEntropyV } ;
-FuncD Layer::calculateDelta[] 	= { Layer::calculateDelta_sigmoid, Layer::calculateDelta_crossEntropy };
+Func Layer::activations[] 		= { Layer::sigmoidV, Layer::crossEntropyV, Layer::reluV } ;
+FuncD Layer::calculateDelta[] 	= { Layer::calculateDelta_sigmoid, Layer::calculateDelta_crossEntropy, Layer::calculateDelta_relu };
 
 std::pointer_to_unary_function<real, real> Layer::sigmoid_ptr = std::ptr_fun(sigmoid);
+std::pointer_to_unary_function<real, real> Layer::relu_ptr = std::ptr_fun(relu);
 
 Layer::Layer(unsigned inputSize, unsigned outputSize, GDMethod* a_gd, Activation a) :
 	func(a),
@@ -83,4 +84,14 @@ Vec Layer::calculateDelta_crossEntropy(const Vec& next, const Vec& x, const Vec&
 {
 	real dot = next.dot(x);
 	return next.cwiseProduct(x) - x * dot;
+}
+
+Vec Layer::calculateDelta_relu(const Vec& next, const Vec& x, const Vec& z)
+{
+	Vec delta(next.size());
+
+	for (unsigned i = 0; i < next.size(); ++i)
+		delta[i] = next[i] * (x[i] < 0 ? 0 : 1); 
+
+	return delta;
 }

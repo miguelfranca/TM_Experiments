@@ -227,6 +227,8 @@ public:
 		clearWidgets();
 	}
 
+	void onSwitch(std::string){}
+
 private:
 	std::vector<Pendulum*> pendulums;
 	const Population<NEAT::Network> *pop;

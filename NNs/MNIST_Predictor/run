@@ -1,0 +1,13 @@
+make -j 8 -s
+
+if [ $? -eq 0 ] ; then
+	name=`basename "$(pwd)"`.exe
+
+	if [[ "$1" == "t" || "$1" == "time" ]]; then
+		time $name
+	elif [[ "$1" == "v" || "$1" == "valgrind" ]]; then
+		valgrind --leak-check=yes $name
+	else
+		$name
+	fi
+fi
