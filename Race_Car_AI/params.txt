@@ -55,7 +55,7 @@ speciationThreshold 		= 6.0 	//default = -1
 //verbose 					= 1 	//default = 1 (true)
 
 //number of threads used in evolution; default; default=1
-numThreads 				= 4
+//numThreads 				= 1
 
 //age and penalty/boost given to organisms who are considered old or young
 //oldAge 					= 20 	//default = 20

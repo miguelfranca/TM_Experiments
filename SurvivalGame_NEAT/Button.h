@@ -3,45 +3,55 @@
 
 #include "MyShape.h"
 
-class Button : public MyShape {
-public:
-	Button() {};
-	Button(float size_xx, float size_yy, sf::Color colorr, float pos_x, float pos_y) { setUp(size_xx, size_yy, colorr, pos_x, pos_y); };
+class Button : public MyShape
+{
+  public:
+    Button(){};
+    Button(float size_xx, float size_yy, sf::Color colorr, float pos_x,
+           float pos_y)
+    {
+        setUp(size_xx, size_yy, colorr, pos_x, pos_y);
+    };
 
-	void setUp(float size_xx, float size_yy, sf::Color colorr, float pos_x, float pos_y);
-	
-	void draw(sf::RenderWindow &window);
+    void setUp(float size_xx, float size_yy, sf::Color colorr, float pos_x,
+               float pos_y);
 
-	void setText(std::string ttext, sf::Color color, unsigned char_size, std::string ffont);
+    void draw(sf::RenderWindow &window);
 
-	void setSubText(int price,sf::Color color, unsigned char_size, std::string ffont = "");
+    void setText(std::string ttext, sf::Color color, unsigned char_size,
+                 std::string ffont);
 
-	void setPosition(float x, float y);
+    void setSubText(int price, sf::Color color, unsigned char_size,
+                    std::string ffont = "");
 
-	void setFunction(int(*ffunc)(Player&, int)) { func = ffunc; }
+    void setPosition(float x, float y);
 
-	bool isClicked(float x, float y);
-	void Upgrade(Player&);
+    void setFunction(int (*ffunc)(Player &, int)) { func = ffunc; }
 
-private:
+    bool isClicked(float x, float y);
+    void Upgrade(Player &);
 
-	static const float up;
-	static const float down;
+    int getPrice() const { return price; }
 
-	int(*func)(Player &player, int price) = NULL;
+  private:
+    static const float up;
+    static const float down;
 
-	sf::Font font;
-	sf::Text text;
-	sf::Text subtext;
-	int price;
+    int (*func)(Player &player, int price) = NULL;
 
-	void setFont(std::string str) { font.loadFromFile(str); }
+    sf::Font font;
+    sf::Text text;
+    sf::Text subtext;
+    int price;
 
-	static void setUpText(sf::Text &ttext, std::string str, sf::Color color, unsigned char_size, sf::Font &ffont);
+    void setFont(std::string str) { font.loadFromFile(str); }
 
-	void setTextPosition();
+    static void setUpText(sf::Text &ttext, std::string str, sf::Color color,
+                          unsigned char_size, sf::Font &ffont);
 
-	void setSubTextPosition();
+    void setTextPosition();
+
+    void setSubTextPosition();
 };
 
 int isClicked(Button *button, int number, sf::Vector2i mouse);

@@ -16,7 +16,7 @@ bool alive_condition(const GameEntities &AI, float elapsedTime)
 
 VecD makeAIinput(GameEntities &enti)
 {
-    unsigned howmany = 5;
+    unsigned howmany = 1;
     auto closest = enti.player.closestBots(enti.bots, howmany);
     // if(closest.size()) std::cout << "Closest Distance = " << closest[0].first
     // << std::endl; std::cout << "Player Health = " << enti.player.getHealth()
@@ -56,24 +56,38 @@ std::pair<float, bool> SBestReplay::stepAI(GameEntities &AI,
 {
     VecD inputs = makeAIinput(AI);
 
-    /*	VecD outputs = net.evaluate(inputs);
-            // VecD outputs(4);
+    VecD outputs = net.evaluate(inputs);
+    // VecD outputs(4);
 
-            bool shootPressed = (outputs[0] > 0.5);
-            float mouseAngle = 2.*M_PI * outputs[1];
-            float shootX = AI.player.getX() + cos(mouseAngle);
-            float shootY = AI.player.getY() + sin(mouseAngle);
-            float moveX = (2.*outputs[2] - 1.);
-            float moveY = (2.*outputs[3] - 1.);*/
-
-    bool shootPressed = 1;
-    float mouseAngle = 2. * M_PI * inputs[3];
+    float moveX = (2. * outputs[0] - 1.);
+    float moveY = (2. * outputs[1] - 1.);
+    bool shootPressed = (outputs[2] > 0.5);
+    float mouseAngle = 2. * M_PI * outputs[3];
     float shootX = AI.player.getX() + cos(mouseAngle);
     float shootY = AI.player.getY() + sin(mouseAngle);
-    float moveX = 0.;
-    float moveY = 0.;
+    /*
+        float moveX = 0.;
+        float moveY = 0.;
+        bool shootPressed = 1;
+        float mouseAngle = 2. * M_PI * inputs[3];
+        float shootX = AI.player.getX() + cos(mouseAngle);
+        float shootY = AI.player.getY() + sin(mouseAngle);
+    */
+
+    auto buttons = SurvivalGame::getButtons();
+    int min_price = AI.player.getMoney();
+    int chosenButton = -1;
+    if (min_price > buttons[0].getPrice())
+        chosenButton = 0;
+    if (min_price > buttons[1].getPrice())
+        chosenButton = 1;
+    if (min_price > buttons[2].getPrice())
+        chosenButton = 2;
+    if (min_price > buttons[3].getPrice())
+        chosenButton = 3;
+
     bool shotshot = SBestReplay::step(AI, shootPressed, shootX, shootY, moveX,
-                                      moveY, 0, fElapsedTime);
+                                      moveY, chosenButton, fElapsedTime);
     // step(AI, ShootPressed, ShootAtX, ShootAtY, HorizontalMovement,
     // VerticlaMovement, ChosenUpgrade, ElapsedTime);
 
@@ -85,11 +99,20 @@ double fitnessFunc(const NEAT::Network &net,
                    const GA::Evolver<NEAT::Network> *ga)
 {
     // int numberUpgrades = ((SurvivalEvolver*)ga)->maxUpgrades;
+    /*    GameEntities &AI = ((SurvivalEvolver *)ga)->AI;
+        AI.bot_number = 0;
+        AI.botPeriod = 0.;
+        AI.shotsPeriod = 0.;
+        AI.botDamagePeriod = 0.;
+        AI.player.respawn();
+        AI.player.setUp(SW * 300., SH * 300.);
+        for (int i = 0; i < max_bots; ++i)
+            AI.bots[i].restart();*/
     GameEntities AI;
     AI.player.setUp(SW * 300., SH * 300.);
 
     float elapsedTime = 0.;
-    static float dt = 5. / 60.;
+    static float dt = 1. / 60.;
 
     while (alive_condition(AI, elapsedTime))
     {
@@ -121,7 +144,7 @@ void SBestReplay::newGeneration(bool skip_unchanged, unsigned skips)
             ga.step();
 
         } while (skip_unchanged && lastFitness == ga.getBestFitness() &&
-                 ++count_skips < skips
+                 (++count_skips < skips || skips == 0)
 
                  && ga.getBestFitness() < BEST_FITNESS);
     }
@@ -190,13 +213,19 @@ bool SBestReplay::onHandleEvent(GF::Event &event)
 // called every frame before draw
 bool SBestReplay::onUpdate(const float fElapsedTime, const float fTotalTime)
 {
-    // if (getFPS() < getMaxFPS() * 0.90) return true;
+    if (1. / fElapsedTime < getMaxFPS() * 0.90)
+        return true;
 
-    // std::cout << "(" << game.player.getX() << "," << game.player.getY() <<
-    // ")" << std::endl; std::cout << game.player.getActive() << std::endl;
-    // usleep(100000);
+    /*    usleep(200000);
 
-    auto info = stepAI(game, *best, 1. / getMaxFPS());
+        VecD inputs = makeAIinput(game);
+        VecD outputs = best->evaluate(inputs);
+        std::cout << "INPUTS";
+        std::cout << inputs << std::endl;
+        std::cout << "OUTPUTS";
+        std::cout << outputs << std::endl;*/
+
+    auto info = stepAI(game, *best, 3. * fElapsedTime);
     float mouseAngle = info.first;
     bool shotshot = info.second;
 
