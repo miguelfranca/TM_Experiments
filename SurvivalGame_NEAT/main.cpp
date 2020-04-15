@@ -4,7 +4,7 @@ int main()
 {
 
 	SurvivalGame gg;
-	gg.showFPS(true);
+	gg.showFPS(false);
 	gg.setMaxFPS(120);
 	gg.run();
 

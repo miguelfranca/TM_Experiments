@@ -186,7 +186,7 @@ bool SurvivalGame::onDraw()
 {
 	window.draw(ground);
 
-	game.player.draw(window, paused);
+	game.player.draw(window, GF::Mouse::getPosition(window), paused);
 	game.player.drawShots(window);
 
 	int digitsS = game.player.getScore() ? 1 + (int)log10(game.player.getScore()) : 0;

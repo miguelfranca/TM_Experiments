@@ -38,7 +38,7 @@ public:
 
 	void move_shots(float fElapsedTime);
 
-	void draw(sf::RenderWindow &window, bool paused);
+	void draw(sf::RenderWindow &window, sf::Vector2f position, bool paused);
 
 	int dead_frame_count;
 	static const int dead_frames_total;

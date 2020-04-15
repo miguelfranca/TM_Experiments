@@ -55,4 +55,6 @@ class SBestReplay : public SurvivalGame
 
     GF::StateMachine *stateMachine;
     sf::RenderWindow *renderer;
+
+    float timer;
 };

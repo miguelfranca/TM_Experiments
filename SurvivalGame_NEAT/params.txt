@@ -4,8 +4,8 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
 //number of inputs and outputs of neural networks
-numInputs 							= 4
-numOutputs 							= 4
+numInputs 							= 2
+numOutputs 							= 1
 
 //probability of doing averaging crossover instead of normal crossover
 //rateCrossoverAverage				= 0.4	//default = 0.4

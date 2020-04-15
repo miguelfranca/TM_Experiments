@@ -115,10 +115,10 @@ void Player::move_shots(float fElapsedTime)
     }
 }
 
-void Player::draw(sf::RenderWindow &window, bool paused)
+void Player::draw(sf::RenderWindow &window, sf::Vector2f position, bool paused)
 {
     // always draw, even if not active (dead)
-    auto look_position = sf::Mouse::getPosition(window);
+    auto look_position = position;
     int index =
         (int)std::round(
             (atan2(look_position.y - getY(), look_position.x - getX()) + PI) *
