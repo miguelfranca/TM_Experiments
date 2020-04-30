@@ -1,6 +1,6 @@
 #include "MyGame.h"
 
-#include "Game_Framework/sfml/ToggleKey.h"
+#include "GraphicsFramework/sfml/ToggleKey.h"
 #include "Image.hpp"
 
 #define TMAX (30. * 60.)

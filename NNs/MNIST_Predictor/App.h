@@ -1,11 +1,11 @@
 #pragma once
 #include <iostream>
 
-#include "Game_Framework/main.h"
-#include "Game_Framework/GUI.h"
-#include "Game_Framework/sfml.h"
-// #include "Game_Framework/Tools.h"
-#include "Game_Framework/Util.h"
+#include "GraphicsFramework/main.h"
+#include "GraphicsFramework/GUI.h"
+#include "GraphicsFramework/sfml.h"
+// #include "GraphicsFramework/Tools.h"
+#include "GraphicsFramework/Util.h"
 
 #include "NeuralNetwork.hpp"
 
@@ -13,7 +13,7 @@
 #define MAX_RADIUS 100
 #define MIN_RADIUS 2
 
-class App : public GF::Game
+class App : public GF::App
 {
 public:
 

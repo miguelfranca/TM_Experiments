@@ -10,13 +10,13 @@
 
 LIB_DIRS 	:= 	../Lib \
 				../../../Gnuplot \
-				../../../Game_Framework/Game_Framework \
-				../../../Game_Framework/Game_Framework/sfml \
-				../../../Game_Framework/Game_Framework/Tools\
-				../../../Game_Framework/Game_Framework/Util\
-				../../../Game_Framework/Game_Framework/holders \
-				../../../Game_Framework/Game_Framework/gui \
-				../../../Game_Framework \
+				../../../GraphicsFramework/GraphicsFramework \
+				../../../GraphicsFramework/GraphicsFramework/sfml \
+				../../../GraphicsFramework/GraphicsFramework/Tools\
+				../../../GraphicsFramework/GraphicsFramework/Util\
+				../../../GraphicsFramework/GraphicsFramework/holders \
+				../../../GraphicsFramework/GraphicsFramework/gui \
+				../../../GraphicsFramework \
 # 				../Tools \
 				
 # USER_FLAGS  := -Wall -Wextra -std=c++11 -Wno-unused-parameter -Wno-unused-function -fopenmp -pthread

@@ -1,5 +1,5 @@
 #pragma once
-#include "Game_Framework/Global.h"
+#include "GraphicsFramework/Global.h"
 #include "Player.h"
 #include "Shot.h"
 #include "Bot.h"

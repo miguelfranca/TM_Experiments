@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Game_Framework/Global.h"
-#include "Game_Framework/holders.h"
+#include "GraphicsFramework/Global.h"
+#include "GraphicsFramework/holders.h"
 #include "Track.h"
 
 #define LATERAL_FRICTION 4.				// seg^-1

@@ -1,4 +1,4 @@
-#include "Game_Framework/sfml.h" // vector operator <<
+#include "GraphicsFramework/sfml.h" // vector operator <<
 #include "Global2.h"
 
 float ratio(const float ratio_double)

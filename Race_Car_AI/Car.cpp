@@ -4,7 +4,7 @@
 
 #include "Car.h"
 #include "Utility.h"
-#include "Game_Framework/sfml.h"
+#include "GraphicsFramework/sfml.h"
 
 //std::vector<sf::Vertex> newLine(sf::Vector2f pos1, sf::Vector2f pos2);
 sf::Vector2f checkForColor(sf::Image& image, sf::Vector2f vec, sf::Vector2f position);

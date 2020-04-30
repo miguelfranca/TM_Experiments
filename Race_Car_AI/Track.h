@@ -1,9 +1,9 @@
 #pragma once
 #include <vector>
-#include "Game_Framework/holders.h"
-#include "Game_Framework/sfml.h"
-#include "Game_Framework/GUI.h"
-#include "Game_Framework/Global.h"
+#include "GraphicsFramework/holders.h"
+#include "GraphicsFramework/sfml.h"
+#include "GraphicsFramework/GUI.h"
+#include "GraphicsFramework/Global.h"
 #include "Utility.h"
 #include <vector>
 #include <math.h>

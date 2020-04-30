@@ -2,10 +2,10 @@
 
 #include <iostream>
 
-#include "Game_Framework/main.h"
-#include "Game_Framework/GUI.h"
-#include "Game_Framework/sfml.h"
-#include "Game_Framework/Tools.h"
+#include "GraphicsFramework/main.h"
+#include "GraphicsFramework/GUI.h"
+#include "GraphicsFramework/sfml.h"
+#include "GraphicsFramework/Tools.h"
 
 #include "NEAT_GA.hpp"
 #include "Image.hpp"
@@ -20,7 +20,7 @@ static bool alive_condition(const sf::Image& track_im, const Track* track, const
 	return track_im.getPixel(car->getPosition().x, SCREENHEIGHT - car->getPosition().y) == GRAY;
 }
 
-class CarAI : public GF::Game {
+class CarAI : public GF::App {
 public:
 
 	CarAI(std::string t = "My Game!!!");

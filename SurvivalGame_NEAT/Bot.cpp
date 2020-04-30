@@ -1,5 +1,5 @@
 #include "Global2.h"
-#include "Game_Framework/Global.h"
+#include "GraphicsFramework/Global.h"
 
 float random(float begin, float end) {return ((float)rand()) / RAND_MAX * (end - begin) + begin;}
 

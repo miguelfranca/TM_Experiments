@@ -2,10 +2,10 @@
 
 #include <iostream>
 
-#include "Game_Framework/main.h"
-#include "Game_Framework/GUI.h"
-#include "Game_Framework/sfml.h"
-#include "Game_Framework/Tools.h"
+#include "GraphicsFramework/main.h"
+#include "GraphicsFramework/GUI.h"
+#include "GraphicsFramework/sfml.h"
+#include "GraphicsFramework/Tools.h"
 
 #include "NEAT_GA.hpp"
 #include "Image.hpp"
@@ -69,7 +69,7 @@ static double fitnessFunc (const NEAT::Network& net, const GA::Evolver<NEAT::Net
 	// return (double)car.getCheckpoint() / car.t;
 }
 
-class CarAI : public GF::Game {
+class CarAI : public GF::App {
 public:
 
 	CarAI(std::string t = "My Game!!!");

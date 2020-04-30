@@ -1,7 +1,7 @@
 #include "Global2.h"
 
 // isto e uma merda porque os includes estao todos fdds nas classes inuteis do SurvivalGame.
-// Isto faz com que o SW que esta no Global.cpp do Game_Framework seja definido depois dos cpps do SurvivalGame compilarem
+// Isto faz com que o SW que esta no Global.cpp do GraphicsFramework seja definido depois dos cpps do SurvivalGame compilarem
 // mete nojo basicamente. Nao me apetece estar a olhar para os includes merdosos
 float SSW = sf::VideoMode::getDesktopMode().width / 1920.f; // scale width
 float SSH = sf::VideoMode::getDesktopMode().height / 1080.f; // scale height

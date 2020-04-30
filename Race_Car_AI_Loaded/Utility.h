@@ -1,6 +1,6 @@
 #pragma once
 #include <cstdlib> //NULL, rand()
-#include "Game_Framework/Global.h"
+#include "GraphicsFramework/Global.h"
 
 int randomI(const int begin, const int end);
 

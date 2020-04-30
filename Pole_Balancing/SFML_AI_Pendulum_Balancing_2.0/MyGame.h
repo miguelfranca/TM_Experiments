@@ -1,18 +1,18 @@
 #pragma once
 
-#include "Game_Framework/Global.h"
-#include "Game_Framework/sfml.h"
+#include "GraphicsFramework/Global.h"
+#include "GraphicsFramework/sfml.h"
 
-#include "Game_Framework/GUI.h"
-#include "Game_Framework/Tools.h"
-#include "Game_Framework/main.h"
+#include "GraphicsFramework/GUI.h"
+#include "GraphicsFramework/Tools.h"
+#include "GraphicsFramework/main.h"
 #include "Pendulum.h"
 #include "UserDoublePendulum.h"
 #include "UserPendulum.h"
 
 #include <iostream>
 
-class MyGame : public GF::Game
+class MyGame : public GF::App
 {
   public:
     MyGame();

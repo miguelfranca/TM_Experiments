@@ -2,10 +2,10 @@
 
 #include <iostream>
 
-#include "Game_Framework/GUI.h"
-#include "Game_Framework/Tools.h"
-#include "Game_Framework/main.h"
-#include "Game_Framework/sfml.h"
+#include "GraphicsFramework/GUI.h"
+#include "GraphicsFramework/Tools.h"
+#include "GraphicsFramework/main.h"
+#include "GraphicsFramework/sfml.h"
 
 #include "Image.hpp"
 #include "NEAT_GA.hpp"
@@ -26,7 +26,7 @@ struct GameEntities
     float botDamagePeriod = 0.;
 };
 
-class SurvivalGame : public GF::Game
+class SurvivalGame : public GF::App
 {
   public:
     SurvivalGame(std::string t = "SurvivalGame");

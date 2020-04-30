@@ -7,12 +7,12 @@
 ########## USER DEFINITIONS
 ##############################################################################################
 
-LIB_DIRS 	:= 	../../../Game_Framework/Game_Framework \
-				../../../Game_Framework/Game_Framework/sfml \
-				../../../Game_Framework/Game_Framework/Tools\
-				../../../Game_Framework/Game_Framework/holders \
-				../../../Game_Framework/Game_Framework/gui \
-				../../../Game_Framework \
+LIB_DIRS 	:= 	../../../GraphicsFramework/GraphicsFramework \
+				../../../GraphicsFramework/GraphicsFramework/sfml \
+				../../../GraphicsFramework/GraphicsFramework/Tools\
+				../../../GraphicsFramework/GraphicsFramework/holders \
+				../../../GraphicsFramework/GraphicsFramework/gui \
+				../../../GraphicsFramework \
 				../../../GAcpp/NEAT/v2/Image \
 				../../../GAcpp/NEAT/v2/Main \
 				../../../GAcpp/GA/v3/GA

@@ -1,10 +1,10 @@
 #pragma once
-#include "Game_Framework/Tools/ODEsolver.hpp"
-#include "Game_Framework/Tools/Random.hpp"
-#include "Game_Framework/holders.h"
-#include "Game_Framework/main.h"
-#include "Game_Framework/sfml.h"
-#include "Game_Framework/sfml/Orientation.h"
+#include "GraphicsFramework/Tools/ODEsolver.hpp"
+#include "GraphicsFramework/Tools/Random.hpp"
+#include "GraphicsFramework/holders.h"
+#include "GraphicsFramework/main.h"
+#include "GraphicsFramework/sfml.h"
+#include "GraphicsFramework/sfml/Orientation.h"
 #include "Image.hpp"
 #include "NEAT_GA.hpp"
 
