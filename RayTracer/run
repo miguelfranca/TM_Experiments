@@ -1,4 +1,4 @@
-make -j 4
+make -j 4 -s
 
 if [ $? -eq 0 ] ; then
   name=`basename "$(pwd)"`.exe

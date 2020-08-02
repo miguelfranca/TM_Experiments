@@ -42,7 +42,7 @@ VecD Geodesic::shoot(const VecD &pos3, const VecD &vel3, bool evolveBackwards,
     ODEsolver ode(geodesic_RHS, 6);
     ode.setParams({V2});
     ode.setPointer(this);
-    // ode.setMethod(ODEsolver::RK45);
+    ode.setMethod(ODEsolver::RK45);
     ode.setStopCriteria(geodesic_stopAtSingularity);
 
     double dtau = 0.01 * (evolveBackwards ? -1. : 1.);

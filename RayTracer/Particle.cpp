@@ -22,18 +22,20 @@ Matrix<VecD> Particle::view(unsigned points_horizontal)
     double xmax = tan(angle_H);
     double ymax = tan(angle_V);
 
-    unsigned points_vertical = points_horizontal * ymax / xmax;
+    unsigned points_vertical = std::round(points_horizontal * ymax / xmax);
 
     double dx = xmax * 2. / (points_horizontal - 1);
     double dy = ymax * 2. / (points_vertical - 1);
 
     Matrix<VecD> mat(points_vertical, points_horizontal, VecD());
 
-    int i = 0, j = 0;
-    for (double y = ymax; y >= -ymax; y -= dy)
+    for (unsigned l = 0; l < points_vertical; ++l)
     {
-        for (double x = -xmax; x <= xmax; x += dx)
+        for (unsigned c = 0; c < points_horizontal; ++c)
         {
+            double x = -xmax + c*dx;
+            double y = -ymax + l*dy;
+
             double alpha_light = atan(y / sqrt(x * x + 1.));
             double beta_light = atan(x);
 
@@ -66,11 +68,8 @@ Matrix<VecD> Particle::view(unsigned points_horizontal)
 
             VecD vel3 = Geodesic::make_vel3(alpha_light, beta_light, 1.);
             VecD end_point = geo.shoot(pos3, vel3, true);
-            mat[i][j] = end_point;
-            ++j;
+            mat[l][c] = end_point;
         }
-        ++i;
-        j = 0;
     }
 
     return mat;
