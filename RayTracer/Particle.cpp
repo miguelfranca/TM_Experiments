@@ -58,7 +58,7 @@ Matrix<VecD> Particle::view(unsigned points_horizontal)
             }
             while (beta_light > M_PI)
                 beta_light -= 2. * M_PI;
-            while (beta_light < -M_PI)
+            while (beta_light <= -M_PI)
                 beta_light += 2. * M_PI;
 
             // std::cout << "Vlast = (" << alpha_light * 180. / M_PI << ","
