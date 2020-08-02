@@ -13,7 +13,7 @@ class Particle
 
     void setAngleViews(double horizontal, double vertical);
 
-    Matrix<VecD> view(unsigned n_rows, unsigned n_cols);
+    Matrix<VecD> view(unsigned points_horizontal);
 
   private:
     const Spacetime &st;

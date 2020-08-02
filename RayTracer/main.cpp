@@ -20,7 +20,8 @@ int main()
     geo.shoot(position, velocity).print();
 
     Particle par(sch, position, alpha, beta, modV, -1.);
-    par.view(10, 10).print();
+    par.setAngleViews(3. / 180. * M_PI, 3. / 180. * M_PI);
+    par.view(3).print();
 
     return 0;
 }

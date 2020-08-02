@@ -15,17 +15,19 @@ void Particle::setAngleViews(double horizontal, double vertical)
     angle_V = vertical;
 }
 
-Matrix<VecD> Particle::view(unsigned n_rows, unsigned n_cols)
+Matrix<VecD> Particle::view(unsigned points_horizontal)
 {
     Geodesic geo(st, V2); // -1 for particles, 0 for light
 
     double xmax = tan(angle_H);
     double ymax = tan(angle_V);
 
-    double dx = xmax * 2. / (n_cols - 1);
-    double dy = ymax * 2. / (n_rows - 1);
+    unsigned points_vertical = points_horizontal * ymax / xmax;
 
-    Matrix<VecD> mat(n_rows, n_cols, VecD());
+    double dx = xmax * 2. / (points_horizontal - 1);
+    double dy = ymax * 2. / (points_vertical - 1);
+
+    Matrix<VecD> mat(points_vertical, points_horizontal, VecD());
 
     int i = 0, j = 0;
     for (double y = ymax; y >= -ymax; y -= dy)
@@ -38,6 +40,29 @@ Matrix<VecD> Particle::view(unsigned n_rows, unsigned n_cols)
             // invert light ray
             alpha_light = -alpha_light;
             beta_light = beta_light + M_PI;
+
+            // add particle alpha and beta
+            alpha_light += alpha;
+            beta_light += beta;
+
+            // normalize to correct domain
+            if (alpha_light > M_PI / 2.)
+            {
+                alpha_light = M_PI - alpha_light;
+                beta_light += M_PI;
+            }
+            if (alpha_light < -M_PI / 2.)
+            {
+                alpha_light = -M_PI - alpha_light;
+                beta_light += M_PI;
+            }
+            while (beta_light > M_PI)
+                beta_light -= 2. * M_PI;
+            while (beta_light < -M_PI)
+                beta_light += 2. * M_PI;
+
+            // std::cout << "Vlast = (" << alpha_light * 180. / M_PI << ","
+            // << beta_light * 180. / M_PI << ")" << std::endl;
 
             VecD vel3 = Geodesic::make_vel3(alpha_light, beta_light, 1.);
             VecD end_point = geo.shoot(pos3, vel3, true);
