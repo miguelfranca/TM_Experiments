@@ -16,7 +16,11 @@ int main()
     double alpha = 0.;
     double beta = M_PI;
     double modV = 1.;
-    geo.shoot(position, alpha, beta, modV).print();
+    VecD velocity = Geodesic::make_vel3(alpha, beta, modV);
+    geo.shoot(position, velocity).print();
+
+    Particle par(sch, position, alpha, beta, modV, -1.);
+    par.view(10, 10).print();
 
     return 0;
 }
