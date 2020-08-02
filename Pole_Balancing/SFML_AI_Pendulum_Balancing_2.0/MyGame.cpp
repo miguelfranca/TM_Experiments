@@ -107,7 +107,6 @@ bool MyGame::onHandleEvent(GF::Event &event)
     if (A.isKeyPressedOnce(event))
     {
         game_state = TRAIN_AI;
-        clearWidgets();
         AI_Active.setString("Evolution");
     }
 
@@ -115,7 +114,6 @@ bool MyGame::onHandleEvent(GF::Event &event)
     if (B.isKeyPressedOnce(event))
     {
         game_state = BEST_AI;
-        clearWidgets();
         AI_Active.setString("Best AI");
     }
 
@@ -125,7 +123,6 @@ bool MyGame::onHandleEvent(GF::Event &event)
         game_state = DOUBLE;
         delete player_double;
         player_double = new UserDoublePendulum(&window);
-        clearWidgets();
         AI_Active.setString("Player _ Double");
     }
 
@@ -135,7 +132,6 @@ bool MyGame::onHandleEvent(GF::Event &event)
         game_state = SINGLE;
         delete player_single;
         player_single = new UserPendulum(&window);
-        clearWidgets();
         AI_Active.setString("Player _ Single");
     }
 
@@ -257,5 +253,4 @@ void MyGame::onDestroy()
         image = nullptr;
     }
 
-    clearWidgets();
 }

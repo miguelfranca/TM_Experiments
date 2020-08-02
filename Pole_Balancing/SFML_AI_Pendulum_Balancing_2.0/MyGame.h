@@ -33,6 +33,8 @@ class MyGame : public GF::App
 
     void onDestroy();
 
+    void onSwitch(std::string) override {}
+
   private:
     std::vector<Pendulum *> pendulums;
     const Population<NEAT::Network> *pop;
