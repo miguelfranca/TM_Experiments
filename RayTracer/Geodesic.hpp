@@ -10,7 +10,7 @@ class Geodesic
   public:
     Geodesic(const Spacetime &a_st, double vel_squared);
 
-    static VecD make_vel3(double alpha, double beta, double modV);
+    // static VecD make_vel3(double alpha, double beta, double modV);
 
     // angles must be sent in radians
     VecD shoot(const VecD &pos3, const VecD &vel3, bool evolveBackwards = false,

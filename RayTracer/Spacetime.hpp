@@ -7,6 +7,7 @@ class Spacetime
 {
   public:
     virtual MatrixD metric(const VecD &pos) const = 0;
+    virtual MatrixD imetric(const VecD &pos) const = 0;
     virtual Vec<MatrixD> christoffels(const VecD &pos) const = 0;
     virtual double
     BH_radius() const = 0; // informs of the radius of an existing BH
@@ -17,12 +18,29 @@ class Spacetime
     VecD velocity(VecD pos4, VecD vel3, double V) const;
 };
 
+class Flat : public Spacetime
+{
+  public:
+    Flat() {}
+
+    MatrixD metric(const VecD &pos) const override;
+    MatrixD imetric(const VecD &pos) const override;
+
+    Vec<MatrixD> christoffels(const VecD &pos) const override;
+
+    double BH_radius() const override
+    {
+        return 0.;
+    } // informs of the radius of an existing BH
+};
+
 class Schwarzschild : public Spacetime
 {
   public:
     Schwarzschild(double a_M = 1.);
 
     MatrixD metric(const VecD &pos) const override;
+    MatrixD imetric(const VecD &pos) const override;
 
     Vec<MatrixD> christoffels(const VecD &pos) const override;
 

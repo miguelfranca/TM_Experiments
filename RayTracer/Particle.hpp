@@ -22,4 +22,7 @@ class Particle
     double V2;
 
     double angle_H, angle_V;
+
+    VecD make_velocity3(double alpha_light, double beta_light,
+                        double modV_light);
 };

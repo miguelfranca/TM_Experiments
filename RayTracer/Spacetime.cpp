@@ -37,6 +37,69 @@ VecD Spacetime::velocity(VecD pos4, VecD vel3, double V) const
     return {v0, vel3[0], vel3[1], vel3[2]};
 }
 
+MatrixD Flat::metric(const VecD &pos) const
+{
+    double r = pos[1];
+    double sintheta = sin(pos[2]);
+
+    MatrixD g(4, 4);
+    g[0][0] = -1.;
+    g[0][1] = 1;
+    g[1][0] = g[0][1];
+    g[2][2] = r * r;
+    g[3][3] = g[2][2] * sintheta * sintheta;
+
+    return g;
+}
+
+MatrixD Flat::imetric(const VecD &pos) const
+{
+    double r = pos[1];
+    double sintheta = sin(pos[2]);
+
+    MatrixD g(4, 4);
+    g[0][1] = 1;
+    g[1][0] = g[0][1];
+    g[1][1] = 1.;
+    g[2][2] = 1. / (r * r);
+    g[3][3] = g[2][2] / (sintheta * sintheta);
+
+    return g;
+}
+
+Vec<MatrixD> Flat::christoffels(const VecD &pos) const
+{
+    Vec<MatrixD> chris(4, MatrixD(4, 4, 0.));
+
+    double r = pos[1];
+
+    double theta = pos[2];
+    double sintheta = sin(theta);
+    double sintheta2 = sintheta * sintheta;
+    double costheta = cos(theta);
+
+    // t
+    chris[0][2][2] = -r;
+    chris[0][3][3] = chris[0][2][2] * sintheta2;
+
+    // r
+    chris[1][2][2] = -r;
+    chris[1][3][3] = chris[1][2][2] * sintheta2;
+
+    // theta
+    chris[2][1][2] = 1. / r;
+    chris[2][2][1] = chris[2][1][2];
+    chris[2][3][3] = -costheta * sintheta;
+
+    // phi
+    chris[3][1][3] = 1. / r;
+    chris[3][3][1] = chris[3][1][3];
+    chris[3][2][3] = costheta / sintheta;
+    chris[3][3][2] = chris[3][2][3];
+
+    return chris;
+}
+
 Schwarzschild::Schwarzschild(double a_M) : M(a_M) {}
 
 MatrixD Schwarzschild::metric(const VecD &pos) const
@@ -54,6 +117,20 @@ MatrixD Schwarzschild::metric(const VecD &pos) const
     return g;
 }
 
+MatrixD Schwarzschild::imetric(const VecD &pos) const
+{
+    double r = pos[1];
+    double sintheta = sin(pos[2]);
+
+    MatrixD g(4, 4);
+    g[0][1] = 1;
+    g[1][0] = g[0][1];
+    g[1][1] = f(r);
+    g[2][2] = 1. / (r * r);
+    g[3][3] = g[2][2] / (sintheta * sintheta);
+
+    return g;
+}
 Vec<MatrixD> Schwarzschild::christoffels(const VecD &pos) const
 {
     Vec<MatrixD> chris(4, MatrixD(4, 4, 0.));

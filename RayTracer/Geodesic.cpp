@@ -9,12 +9,12 @@ Geodesic::Geodesic(const Spacetime &a_st, double vel_squared)
 {
 }
 
-VecD Geodesic::make_vel3(double alpha, double beta, double modV)
-{
-    modV = abs(modV);
-    return {modV * cos(beta) * cos(alpha), modV * sin(alpha),
-            modV * sin(beta) * cos(alpha)};
-}
+// VecD Geodesic::make_vel3(double alpha, double beta, double modV)
+// {
+//     modV = abs(modV);
+//     return {modV * cos(beta) * cos(alpha), modV * sin(alpha),
+//             modV * sin(beta) * cos(alpha)};
+// }
 
 // angles must be sent in radians
 VecD Geodesic::shoot(const VecD &pos3, const VecD &vel3, bool evolveBackwards,
@@ -45,6 +45,7 @@ VecD Geodesic::shoot(const VecD &pos3, const VecD &vel3, bool evolveBackwards,
     ode.setMethod(ODEsolver::RK45);
     ode.setStopCriteria(geodesic_stopAtSingularity);
 
+    // double dtau = 0.1 * (evolveBackwards ? -1. : 1.);
     double dtau = 0.01 * (evolveBackwards ? -1. : 1.);
     double tau = 1e6 * (evolveBackwards ? -1. : 1.);
 
