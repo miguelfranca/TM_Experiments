@@ -21,17 +21,17 @@ bool Application::onCreate()
 	Schwarzschild st(M);
 	// Flat st;
 
-	VecD position({10., M_PI / 2., M_PI});
+	VecD position({1., M_PI / 2., 0.});
 	double alpha = 0. / 180. * M_PI;
-	double beta = 180. / 180. * M_PI;
+	double beta = 90. / 180. * M_PI;
 	double modV = 1.;
 
 	Particle par(st, position, alpha, beta, modV, -1.);
 	par.setAngleViews(45. / 180. * M_PI, 45. / 180. * M_PI);
-	auto mat = par.view(2000);
+	auto mat = par.view(1000);
 	// mat.print();
 
-	sky.loadFromFile("res/images/HUBBLE_cut_1.png");
+	sky.loadFromFile("res/images/HUBBLE_cut_3.png");
 	sf::Image view;
 	view.create(mat.getNC(), mat.getNL());
 
@@ -87,7 +87,7 @@ bool Application::onCreate()
 				// << std::endl;
 
 				color = sky.getPixel(std::round(x), std::round(y));
-				color = sf::Color(color.r + 5, color.g + 5, color.b + 5);
+				color = sf::Color(color.r, color.g, color.b);
 			}
 
 			view.setPixel(c, l, color);
