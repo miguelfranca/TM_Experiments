@@ -2,6 +2,8 @@
 
 #include "Spacetime.hpp"
 
+#include "ODEsolver.hpp"
+
 VecD geodesic_RHS(const VecD &vars, const VecD &params, void *ptr);
 bool geodesic_stopAtSingularity(const VecD &vars, const VecD &params, void *);
 
@@ -18,4 +20,7 @@ class Geodesic
 
     const Spacetime &st;
     const double V2; // -1 for massive particles, 0 for null rays
+
+  private:
+    ODEsolver ode;
 };

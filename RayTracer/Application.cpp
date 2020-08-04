@@ -9,121 +9,139 @@
 
 Application::Application(std::string t)
 {
-	title = t;
-	setStaticScreen(true);
-	setupWindow(1000, 1000, 1000, 0);
+    title = t;
+    setStaticScreen(true);
+    setupWindow(1000, 1000, 1000, 0);
 }
 
 // called once before the loop starts
 bool Application::onCreate()
 {
-	double M = 0.25;
-	Schwarzschild st(M);
-	// Flat st;
+    // Flat st;
 
-	VecD position({1., M_PI / 2., 0.});
-	double alpha = 0. / 180. * M_PI;
-	double beta = 90. / 180. * M_PI;
-	double modV = 1.;
+    double M = 0.25;
+    Schwarzschild st(M);
 
-	Particle par(st, position, alpha, beta, modV, -1.);
-	par.setAngleViews(45. / 180. * M_PI, 45. / 180. * M_PI);
-	auto mat = par.view(1000);
-	// mat.print();
+    // double M = 0.25;
+    // double a = 0.;
+    // Kerr st(M, a);
 
-	sky.loadFromFile("res/images/HUBBLE_cut_3.png");
-	sf::Image view;
-	view.create(mat.getNC(), mat.getNL());
+    VecD position({10., M_PI / 2., 0});
+    double alpha = 0. / 180. * M_PI;
+    double beta = 180. / 180. * M_PI;
+    double modV = 1.;
 
-	for (unsigned l = 0; l < mat.getNL(); ++l) {
-		for (unsigned c = 0; c < mat.getNC(); ++c) {
-			auto vec = mat[l][c];
-			sf::Color color;
-			double r = vec[1];
+    Particle par(st, position, alpha, beta, modV, -1.);
+    par.setAngleViews(45. / 180. * M_PI, 45. / 180. * M_PI);
+    auto mat = par.view(1000);
+    // mat.print();
 
-			if (r < st.BH_radius() || std::isnan(r)) {
-				// std::cout << "HIT BH for (" << l << "," << c << ")"
-				// << std::endl;
-				color = BLACK;
-			}
-			else {
-				double theta = vec[2];
-				double phi = vec[3];
+    // sky.loadFromFile("res/images/HUBBLE_cut_3.png");
+    // sky.loadFromFile("res/images/stars_2.png");
+    sky.loadFromFile("res/images/stars_3.jpg");
+    sf::Image view;
+    view.create(mat.getNC(), mat.getNL());
 
-				// std::cout << "TF = (" << l << "," << c << ") -> ("
-				//           << theta / M_PI * 180. << "," << phi / M_PI * 180.
-				//           << ")" << std::endl;
+    // bool do_elliptic_parametrization = true;
+    bool do_elliptic_parametrization = false;
 
-				theta -= M_PI / 2;
+    for (unsigned l = 0; l < mat.getNL(); ++l)
+    {
+        for (unsigned c = 0; c < mat.getNC(); ++c)
+        {
+            auto vec = mat[l][c];
+            sf::Color color;
+            double r = vec[1];
 
-				while (phi > M_PI)
-					phi -= 2. * M_PI;
+            if (r < st.BH_radius() || std::isnan(r))
+            {
+                color = BLACK;
+            }
+            else
+            {
+                double theta = vec[2];
+                double phi = vec[3];
 
-				while (phi <= -M_PI)
-					phi += 2. * M_PI;
+                theta -= M_PI / 2;
 
-				// double phi2 = phi * phi;
-				// double PI2 = M_PI * M_PI;
-				// double theta2 = theta * theta;
+                while (phi > M_PI)
+                    phi -= 2. * M_PI;
 
-				// double x = (phi < 0 ? -1 : 1) * M_PI *
-				//            std::sqrt(phi2 * (PI2 - 4. * theta2) /
-				//                      (PI2 * PI2 - 4. * theta2 * phi2));
-				// double y = (theta < 0 ? -1 : 1) * M_PI *
-				//            std::sqrt(theta2 * (PI2 - phi2) /
-				//                      (PI2 * PI2 - 4. * theta2 * phi2));
-				double x = phi;
-				double y = theta;
+                while (phi <= -M_PI)
+                    phi += 2. * M_PI;
 
-				sf::Vector2u size = sky.getSize();
-				y = (y + M_PI / 2.) / M_PI * size.y;
-				x = (x + M_PI) / (2. * M_PI) * size.x;
+                double x, y;
+                if (do_elliptic_parametrization)
+                {
 
-				// flip y because SFML grows y downwards
-				y = size.y - y;
+                    // code for elliptic parametrization of sky map
+                    double phi2 = phi * phi;
+                    double PI2 = M_PI * M_PI;
+                    double theta2 = theta * theta;
 
-				// std::cout << "XY = (" << x / size.x << "," << y / size.y <<
-				// ")"
-				// << std::endl;
+                    x = (phi < 0 ? -1 : 1) * M_PI *
+                        std::sqrt(phi2 * (PI2 - 4. * theta2) /
+                                  (PI2 * PI2 - 4. * theta2 * phi2));
+                    y = (theta < 0 ? -1 : 1) * M_PI *
+                        std::sqrt(theta2 * (PI2 - phi2) /
+                                  (PI2 * PI2 - 4. * theta2 * phi2));
+                }
+                else
+                {
+                    x = phi;
+                    y = theta;
+                }
 
-				color = sky.getPixel(std::round(x), std::round(y));
-				color = sf::Color(color.r, color.g, color.b);
-			}
+                sf::Vector2u size = sky.getSize();
+                y = (y + M_PI / 2.) / M_PI * size.y;
+                x = (x + M_PI) / (2. * M_PI) * size.x;
 
-			view.setPixel(c, l, color);
-		}
-	}
+                // flip y because SFML grows y downwards
+                y = size.y - y;
 
-	std::cout << "FINISHED" << std::endl;
+                color = sky.getPixel(std::round(x), std::round(y));
+                auto lambda_color = [](unsigned color) {
+                    unsigned new_color = color + 5;
+                    return std::min(new_color, (unsigned)255);
+                };
+                color = sf::Color(lambda_color(color.r), lambda_color(color.g),
+                                  lambda_color(color.b));
+            }
 
-	sf::Texture txt;
+            view.setPixel(c, l, color);
+        }
+    }
 
-	txt.loadFromImage(view);
-	sf::Sprite sprt;
+    std::cout << "FINISHED" << std::endl;
 
-	sprt.setTexture(txt, true);
-	sprt.setPosition(0, 0);
+    sf::Texture txt;
 
-	double sx = ((double)SCREENWIDTH) / mat.getNC();
-	double sy = ((double)SCREENHEIGHT) / mat.getNL();
+    txt.loadFromImage(view);
+    sf::Sprite sprt;
 
-	sx = std::min(sx, sy);
-	sprt.scale(sx, sx);
+    sprt.setTexture(txt, true);
+    sprt.setPosition(0, 0);
 
-	window.draw(sprt);
+    double sx = ((double)SCREENWIDTH) / mat.getNC();
+    double sy = ((double)SCREENHEIGHT) / mat.getNL();
 
-	view.saveToFile("screenshot" + std::to_string(time(NULL)) + ".png");
+    sx = std::min(sx, sy);
+    sprt.scale(sx, sx);
 
-	return true;
+    window.draw(sprt);
+
+    view.saveToFile("screenshot" + std::to_string(time(NULL)) + ".png");
+
+    return true;
 }
 
 // first thing to be called every frame
-bool Application::onHandleEvent(GF::Event& event) { return true; }
+bool Application::onHandleEvent(GF::Event &event) { return true; }
 
 // called every frame before draw
 bool Application::onUpdate(const float fElapsedTime, const float fTotalTime)
 {
-	return true;
+    return true;
 }
 
 // last thing to be called every frame
