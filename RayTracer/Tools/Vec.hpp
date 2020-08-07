@@ -17,6 +17,8 @@
 #define GET_MACRO_V(_1, _2, _3, NAME, ...) NAME
 #define FORV(...) GET_MACRO_V(__VA_ARGS__, FORV3, FORV2, FORV1)(__VA_ARGS__)
 
+#ifndef FANCY_FORS
+#define FANCY_FORS
 #define FOR0(N) FOR1(i, N)
 #define FOR1(IDX, DIM) FOR1_I(IDX, 0, DIM)
 #define FOR1_I(IDX, INIT, DIM) for (int IDX = INIT; IDX < DIM; ++IDX)
@@ -29,6 +31,7 @@
 #define FOR(...)                                                               \
     GET_MACRO(__VA_ARGS__, FOR2_I, FOR2_2, FOR2, FOR1_I, FOR1, FOR0)           \
     (__VA_ARGS__)
+#endif
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 

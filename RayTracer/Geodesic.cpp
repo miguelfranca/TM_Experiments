@@ -64,7 +64,7 @@ bool geodesic_stopAtSingularity(const VecD &vars, const VecD &params, void *ptr)
 {
     Geodesic *geodesic = (Geodesic *)ptr;
     double BH_r = geodesic->st.BH_radius();
-    static double rMAX = 100. * (BH_r == 0. ? 1. : BH_r);
+    static double rMAX = 10000. * (BH_r == 0. ? 1. : BH_r);
 
     double r = vars[1];
     double vr = vars[4];
