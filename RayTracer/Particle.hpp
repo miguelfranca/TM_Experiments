@@ -16,16 +16,19 @@ class Particle
     Matrix<VecD> view(unsigned points_horizontal);
 
   private:
-    const Spacetime &st;
-    VecD pos3, vel3;
-    double alpha, beta, modV;
-    double V2;
+    const Spacetime &m_st;
+    VecD m_pos3, m_vel3;
+    VecD m_pos4, m_vel4;
+    double m_alpha, m_beta;
+    double m_V2;
 
-    double angle_H, angle_V;
+    double m_angle_H, m_angle_V;
 
-    VecD make_velocity3(double alpha_light, double beta_light,
+    VecD make_velocity4(double alpha_light, double beta_light,
                         double modV_light);
 
+    double calculate_redshift(const VecD &vel4_ini, const VecD &end);
+
     void calculate_tetrad();
-    MatrixD tetrad;
+    MatrixD m_tetrad;
 };

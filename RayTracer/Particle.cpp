@@ -7,26 +7,26 @@
 Particle::Particle(const Spacetime &a_st, const VecD &a_pos3,
                    const VecD &a_vel3, double a_alpha, double a_beta,
                    double vel_squared)
-    : st(a_st), pos3(a_pos3), vel3(a_vel3), alpha(a_alpha), beta(a_beta),
-      V2(vel_squared), angle_H(M_PI / 4.), angle_V(M_PI / 4.), tetrad(4, 4, 0.)
+    : m_st(a_st), m_pos3(a_pos3), m_vel3(a_vel3), m_alpha(a_alpha),
+      m_beta(a_beta), m_V2(vel_squared), m_angle_H(M_PI / 4.),
+      m_angle_V(M_PI / 4.), m_tetrad(4, 4, 0.)
 {
+    m_pos4 = {NAN, m_pos3[0], m_pos3[1], m_pos3[2]};
+    m_vel4 = m_st.velocity(m_pos4, m_vel3, m_V2);
+
     calculate_tetrad();
 }
 
 void Particle::setAngleViews(double horizontal, double vertical)
 {
-    angle_H = horizontal;
-    angle_V = vertical;
+    m_angle_H = horizontal;
+    m_angle_V = vertical;
 }
 
 void Particle::calculate_tetrad()
 {
-    VecD pos4({NAN});
-    pos4.insert(pos3);
-
-    auto g = st.metric(pos4);
-    auto vel4 = st.velocity(pos4, vel3, -1);
-    VecD et = vel4;
+    auto g = m_st.metric(m_pos4);
+    const VecD &et = m_vel4;
     VecD et_down = g.prod(et);
 
     VecD vr = {0., 1., 0., 0.};
@@ -51,12 +51,12 @@ void Particle::calculate_tetrad()
     er = er / sqrt(g.prod(er).dot(er));
     // VecD er_down = g.prod(er);
 
-    tetrad[0] = et;
-    tetrad[1] = er;
-    tetrad[2] = eq;
-    tetrad[3] = ef;
+    m_tetrad[0] = et;
+    m_tetrad[1] = er;
+    m_tetrad[2] = eq;
+    m_tetrad[3] = ef;
 
-    tetrad = tetrad.transpose();
+    m_tetrad = m_tetrad.transpose();
 
     /*
         std::cout << g.prod(et).dot(et) << std::endl;
@@ -69,7 +69,7 @@ void Particle::calculate_tetrad()
         std::cout << g.prod(er).dot(eq) << std::endl;
         std::cout << g.prod(er).dot(ef) << std::endl;
         std::cout << g.prod(eq).dot(ef) << std::endl;
-        tetrad.print();
+        m_tetrad.print();
         throw std::runtime_error("stop");
     */
 }
@@ -77,18 +77,18 @@ void Particle::calculate_tetrad()
 Matrix<VecD> Particle::view(unsigned points_horizontal)
 {
     // shoot light rays
-    Geodesic geo(st, 0); // -1 for particles, 0 for light
+    Geodesic geo(m_st, 0); // -1 for particles, 0 for light
 
     unsigned points_vertical =
-        std::round(points_horizontal * angle_V / angle_H);
+        std::round(points_horizontal * m_angle_V / m_angle_H);
     points_vertical = std::max((unsigned)2, points_vertical);
 
     Matrix<VecD> mat(points_vertical, points_horizontal, VecD());
 
     ProgressBar pb(points_vertical);
 
-    double dV = 2. * angle_V / (points_vertical - 1);
-    double dH = 2. * angle_H / (points_horizontal - 1);
+    double dV = 2. * m_angle_V / (points_vertical - 1);
+    double dH = 2. * m_angle_H / (points_horizontal - 1);
 
 #pragma omp parallel for default(none)                                         \
     shared(pb, points_vertical, points_horizontal, geo, mat, dV, dH)
@@ -96,13 +96,16 @@ Matrix<VecD> Particle::view(unsigned points_horizontal)
     {
         for (unsigned c = 0; c < points_horizontal; ++c)
         {
-            double alpha_light = angle_V - l * dV;
-            double beta_light = -angle_H + c * dH;
+            double alpha_light = m_angle_V - l * dV;
+            double beta_light = -m_angle_H + c * dH;
 
-            VecD vel3 = make_velocity3(alpha_light, beta_light, 1.);
+            VecD vel4 = make_velocity4(alpha_light, beta_light, 1.);
+            VecD vel3 = {vel4[1], vel4[2], vel4[3]};
 
-            VecD end_point = geo.shoot(pos3, vel3, true);
+            VecD end_point = geo.shoot(m_pos3, vel3, true);
             // VecD end_point = geo.shoot(pos3, vel3, true, true);
+            double redshift = calculate_redshift(vel4, end_point);
+            end_point.push_back(redshift);
 
             mat[l][c] = end_point;
         }
@@ -112,20 +115,20 @@ Matrix<VecD> Particle::view(unsigned points_horizontal)
     return mat;
 }
 
-VecD Particle::make_velocity3(double alpha_light, double beta_light,
+VecD Particle::make_velocity4(double alpha_light, double beta_light,
                               double modV_light)
 {
     // alpha_light and beta_light: light angles from user reference point
     // alpha and beta: direction user is looking at
     modV_light = abs(modV_light);
 
-    double cosa = cos(alpha);
+    double cosa = cos(m_alpha);
     double cosal = cos(alpha_light);
-    double sina = sin(alpha);
+    double sina = sin(m_alpha);
     double sinal = sin(alpha_light);
-    double cosb = cos(beta);
+    double cosb = cos(m_beta);
     double cosbl = cos(beta_light);
-    double sinb = sin(beta);
+    double sinb = sin(m_beta);
     double sinbl = sin(beta_light);
 
     double vr_rot = cosa * cosal * cosb * cosbl - cosb * sina * sinal -
@@ -154,8 +157,7 @@ VecD Particle::make_velocity3(double alpha_light, double beta_light,
 
     // tetrad.print();
 
-    VecD vel4 = tetrad.prod(vel4_user);
-    VecD vel3 = {vel4[1], vel4[2], vel4[3]};
+    VecD vel4 = m_tetrad.prod(vel4_user);
 
     // convert to global coordinates
     // this assumes the metric is of type (g00 g01 g10 g11) x (g22 g33), not
@@ -196,5 +198,27 @@ VecD Particle::make_velocity3(double alpha_light, double beta_light,
         return vel4;
     }
 
-    return vel3;
+    return vel4;
+}
+
+double Particle::calculate_redshift(const VecD &vel4_init, const VecD &end)
+{
+    auto g_init = m_st.metric(m_pos4);
+
+    VecD pos4_end = {NAN, end[1], end[2], end[3]};
+    auto g_end = m_st.metric(pos4_end);
+
+    VecD vel3_end = {end[4], end[5], end[6]};
+    VecD vel4_end = m_st.velocity(pos4_end, vel3_end, 0.);
+
+    double freq_init = g_init.prod(m_vel4).dot(vel4_init);
+
+    VecD vel4_stars = {1., 0., 0., 0.};
+    double freq_end = g_end.prod(vel4_stars).dot(vel4_end);
+
+    std::cout << std::endl;
+    std::cout << "FREQ INIT = " << freq_init << std::endl;
+    std::cout << "FREQ END  = " << freq_end << std::endl;
+
+    return freq_end / freq_init;
 }
