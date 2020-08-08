@@ -4,17 +4,74 @@
 
 #include "ProgressBar.hpp"
 
-Particle::Particle(const Spacetime &a_st, const VecD &a_pos3, double a_alpha,
-                   double a_beta, double a_modV, double vel_squared)
-    : st(a_st), pos3(a_pos3), alpha(a_alpha), beta(a_beta), modV(a_modV),
-      V2(vel_squared), angle_H(M_PI / 4.), angle_V(M_PI / 4.)
+Particle::Particle(const Spacetime &a_st, const VecD &a_pos3,
+                   const VecD &a_vel3, double a_alpha, double a_beta,
+                   double vel_squared)
+    : st(a_st), pos3(a_pos3), vel3(a_vel3), alpha(a_alpha), beta(a_beta),
+      V2(vel_squared), angle_H(M_PI / 4.), angle_V(M_PI / 4.), tetrad(4, 4, 0.)
 {
+    calculate_tetrad();
 }
 
 void Particle::setAngleViews(double horizontal, double vertical)
 {
     angle_H = horizontal;
     angle_V = vertical;
+}
+
+void Particle::calculate_tetrad()
+{
+    VecD pos4({NAN});
+    pos4.insert(pos3);
+
+    auto g = st.metric(pos4);
+    auto vel4 = st.velocity(pos4, vel3, -1);
+    VecD et = vel4;
+    VecD et_down = g.prod(et);
+
+    VecD vr = {0., 1., 0., 0.};
+    VecD vq = {0., 0., 1., 0.};
+    VecD vf = {0., 0., 0., 1.};
+
+    VecD proj_et_vq = -(et_down.dot(vq)) * et;
+    VecD eq = vq - proj_et_vq;
+    eq = eq / sqrt(g.prod(eq).dot(eq));
+    VecD eq_down = g.prod(eq);
+
+    VecD proj_et_vf = -(et_down.dot(vf)) * et;
+    VecD proj_eq_vf = (eq_down.dot(vf)) * eq;
+    VecD ef = vf - proj_et_vf - proj_eq_vf;
+    ef = ef / sqrt(g.prod(ef).dot(ef));
+    VecD ef_down = g.prod(ef);
+
+    VecD proj_et_vr = -(et_down.dot(vr)) * et;
+    VecD proj_eq_vr = (eq_down.dot(vr)) * eq;
+    VecD proj_ef_vr = (ef_down.dot(vr)) * ef;
+    VecD er = vr - proj_et_vr - proj_eq_vr - proj_ef_vr;
+    er = er / sqrt(g.prod(er).dot(er));
+    // VecD er_down = g.prod(er);
+
+    tetrad[0] = et;
+    tetrad[1] = er;
+    tetrad[2] = eq;
+    tetrad[3] = ef;
+
+    tetrad = tetrad.transpose();
+
+    /*
+        std::cout << g.prod(et).dot(et) << std::endl;
+        std::cout << g.prod(er).dot(er) << std::endl;
+        std::cout << g.prod(eq).dot(eq) << std::endl;
+        std::cout << g.prod(ef).dot(ef) << std::endl;
+        std::cout << g.prod(et).dot(er) << std::endl;
+        std::cout << g.prod(et).dot(eq) << std::endl;
+        std::cout << g.prod(et).dot(ef) << std::endl;
+        std::cout << g.prod(er).dot(eq) << std::endl;
+        std::cout << g.prod(er).dot(ef) << std::endl;
+        std::cout << g.prod(eq).dot(ef) << std::endl;
+        tetrad.print();
+        throw std::runtime_error("stop");
+    */
 }
 
 Matrix<VecD> Particle::view(unsigned points_horizontal)
@@ -79,6 +136,7 @@ VecD Particle::make_velocity3(double alpha_light, double beta_light,
 
     VecD vel3_rot = {modV_light * vr_rot, modV_light * vtheta_rot,
                      modV_light * vphi_rot};
+    // vel3_rot.print();
 
     // std::cout << std::endl;
     // std::cout << vel3_rot << std::endl;
@@ -86,40 +144,57 @@ VecD Particle::make_velocity3(double alpha_light, double beta_light,
     //                  vel3_rot[2] * vel3_rot[2]
     //           << std::endl;
 
-    // 1st coordinate shouldn't matter, so sending a nan just to make
-    // sure it really doesn't matter
-    VecD pos4({NAN});
-    pos4.insert(pos3);
+    // the right one is negative. This is not negative time. It's in 'v'
+    // coordinates. I'm slightly confused to why this works
+    // double vel4_0 = -(vel3_rot[0] > 0 ? 1. : -1.) *
+    double vel4_0 = sqrt(vel3_rot[0] * vel3_rot[0] + vel3_rot[1] * vel3_rot[1] +
+                         vel3_rot[2] * vel3_rot[2]);
+    // flip spatial part of ray of light so that we can evolve it backwards
+    VecD vel4_user = {vel4_0, -vel3_rot[0], -vel3_rot[1], -vel3_rot[2]};
+
+    // tetrad.print();
+
+    VecD vel4 = tetrad.prod(vel4_user);
+    VecD vel3 = {vel4[1], vel4[2], vel4[3]};
 
     // convert to global coordinates
     // this assumes the metric is of type (g00 g01 g10 g11) x (g22 g33), not
     // sure it stands in general
-    auto ig = st.imetric(pos4);
-    vel3_rot[0] *= sqrt(std::abs(ig[1][1]));
-    vel3_rot[1] *= sqrt(std::abs(ig[2][2]));
-    vel3_rot[2] *= sqrt(std::abs(ig[3][3]));
+    // auto ig = st.imetric(pos4);
+    // vel3_rot[0] *= sqrt(std::abs(ig[1][1]));
+    // vel3_rot[1] *= sqrt(std::abs(ig[2][2]));
+    // vel3_rot[2] *= sqrt(std::abs(ig[3][3]));
 
     // in the end, flip ray of light so that we can evolve it backwards
-    vel3_rot[0] *= -1;
-    vel3_rot[1] *= -1;
-    vel3_rot[2] *= -1;
+    // vel3_rot[0] *= -1;
+    // vel3_rot[1] *= -1;
+    // vel3_rot[2] *= -1;
+    // vel3[0] *= -1;
+    // vel3[1] *= -1;
+    // vel3[2] *= -1;
 
-    auto vel4 = st.velocity(pos4, vel3_rot, 0);
+    // 1st coordinate shouldn't matter, so sending a nan just to make
+    // sure it really doesn't matter
+    // VecD pos4({NAN});
+    // pos4.insert(pos3);
     // std::cout << "VEL4" << std::endl;
     // vel4.print();
+    // st.velocity(pos4, vel3, 0).print();
     // std::cout << std::endl;
     if (vel4.norm() == 0. /* they are all 0*/)
     {
         throw std::runtime_error(
             "3 velocity invalid for position and particle type chosen.");
-        return pos4;
+        return vel4;
     }
     // geodesic invalid (probably inside BH in an orbit that is invalid, for
     // example too big angles, just let it be and assume it collides to
     // singularity)
     if (std::isnan(vel4[0]))
     {
+        throw std::runtime_error("Check me.");
+        return vel4;
     }
 
-    return vel3_rot;
+    return vel3;
 }

@@ -66,7 +66,10 @@ bool geodesic_stopAtSingularity(const VecD &vars, const VecD &params, void *ptr)
     double BH_r = geodesic->st.BH_radius();
     static double rMAX = 10000. * (BH_r == 0. ? 1. : BH_r);
 
+    double t = vars[0];
     double r = vars[1];
     double vr = vars[4];
-    return (r < BH_r * 0.95 && vr >= 0) || r > rMAX || std::isnan(vr);
+    return (r < BH_r * 0.95 &&
+            vr * t <= 0 /*>0 if backwards, <0 if forward*/) ||
+           r > rMAX || std::isnan(vr);
 }
