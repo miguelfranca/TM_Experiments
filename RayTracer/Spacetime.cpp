@@ -35,6 +35,10 @@ VecD Spacetime::velocity(VecD pos4, VecD vel3, double V) const
             // a);
             (-b - sqrt(b * b - 4. * a * c)) / (2. * a);
     }
+
+    // VecD vel4 = {v0, vel3[0], vel3[1], vel3[2]};
+    // vel4.print();
+    // return vel4;
     return {v0, vel3[0], vel3[1], vel3[2]};
 }
 

@@ -18,7 +18,22 @@ Application::Application(std::string t)
 }
 
 // called once before the loop starts
-bool Application::onCreate() { return true; }
+bool Application::onCreate()
+{
+    /*
+        double M = 0.25;
+        Schwarzschild st(M);
+
+        VecD vel3 = {0.1, 0., 0.};
+
+        // VecD end_point = geo.shoot(pos3, vel3, true);
+        Geodesic geo(st, -1); // -1 for particles, 0 for light
+        // Geodesic geo(st, 0); // -1 for particles, 0 for light
+        VecD end_point = geo.shoot({10., M_PI / 2., 0.}, vel3, false, true);
+        return false;
+    */
+    return true;
+}
 
 // first thing to be called every frame
 bool Application::onHandleEvent(GF::Event &event)
@@ -44,11 +59,12 @@ bool Application::onHandleEvent(GF::Event &event)
 
     // VecD position({10., M_PI / 2., pan});
     VecD position({10., M_PI / 2., 0.});
+    VecD velocity({-0.9, 0., 0.});
     double alpha = 0. / 180. * M_PI;
     double beta = 0. / 180. * M_PI;
     double modV = 1.;
 
-    Particle par(st, position, alpha, beta, modV, -1.);
+    Particle par(st, position, velocity, alpha, beta, -1.);
     par.setAngleViews(45. / 180. * M_PI, 45. / 180. * M_PI);
     auto mat = par.view(200);
     // mat.print();

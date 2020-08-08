@@ -8,8 +8,8 @@
 class Particle
 {
   public:
-    Particle(const Spacetime &a_st, const VecD &a_pos3, double a_alpha,
-             double a_beta, double a_modV, double vel_squared);
+    Particle(const Spacetime &a_st, const VecD &a_pos3, const VecD &vel3,
+             double view_alpha, double view_beta, double vel_squared);
 
     void setAngleViews(double horizontal, double vertical);
 
@@ -17,7 +17,7 @@ class Particle
 
   private:
     const Spacetime &st;
-    VecD pos3;
+    VecD pos3, vel3;
     double alpha, beta, modV;
     double V2;
 
@@ -25,4 +25,7 @@ class Particle
 
     VecD make_velocity3(double alpha_light, double beta_light,
                         double modV_light);
+
+    void calculate_tetrad();
+    MatrixD tetrad;
 };
