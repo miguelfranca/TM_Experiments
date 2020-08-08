@@ -59,14 +59,13 @@ bool Application::onHandleEvent(GF::Event &event)
 
     // VecD position({10., M_PI / 2., pan});
     VecD position({10., M_PI / 2., 0.});
-    VecD velocity({-0.9, 0., 0.});
+    VecD velocity({0.0, 0., 0.});
     double alpha = 0. / 180. * M_PI;
     double beta = 0. / 180. * M_PI;
-    double modV = 1.;
 
     Particle par(st, position, velocity, alpha, beta, -1.);
     par.setAngleViews(45. / 180. * M_PI, 45. / 180. * M_PI);
-    auto mat = par.view(200);
+    auto mat = par.view(250);
     // mat.print();
 
     // ImageSkyMap sky(st, "res/images/stars_3.jpg", false);
