@@ -22,7 +22,7 @@ VecD Geodesic::shoot(const VecD &pos3, const VecD &vel3, bool evolveBackwards,
 
     // double dtau = 0.1 * (evolveBackwards ? -1. : 1.);
     double dtau = 0.01 * (evolveBackwards ? -1. : 1.);
-    double tau = 1e6 * (evolveBackwards ? -1. : 1.);
+    double tau = 1e8 * (evolveBackwards ? -1. : 1.);
 
     VecD v;
     if (showHistory)
@@ -68,5 +68,5 @@ bool geodesic_stopAtSingularity(const VecD &vars, const VecD &params, void *ptr)
 
     double r = vars[1];
     double vr = vars[4];
-    return (r < BH_r * 0.05 && vr >= 0) || r > rMAX || std::isnan(vr);
+    return (r < BH_r * 0.95 && vr >= 0) || r > rMAX || std::isnan(vr);
 }
