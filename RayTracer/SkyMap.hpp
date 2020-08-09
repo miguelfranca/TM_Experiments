@@ -46,3 +46,6 @@ public:
 private:
     sf::Image sky;
 };
+
+sf::Color redshiftColor(sf::Color color, double factor);
+sf::Color wavelengthToColor(double wavelength);
