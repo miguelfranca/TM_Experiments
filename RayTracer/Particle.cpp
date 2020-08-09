@@ -216,9 +216,9 @@ double Particle::calculate_redshift(const VecD &vel4_init, const VecD &end)
     VecD vel4_stars = {1., 0., 0., 0.};
     double freq_end = g_end.prod(vel4_stars).dot(vel4_end);
 
-    std::cout << std::endl;
-    std::cout << "FREQ INIT = " << freq_init << std::endl;
-    std::cout << "FREQ END  = " << freq_end << std::endl;
+    // std::cout << std::endl;
+    // std::cout << "FREQ INIT = " << freq_init << std::endl;
+    // std::cout << "FREQ END  = " << freq_end << std::endl;
 
     return freq_end / freq_init;
 }
