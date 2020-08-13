@@ -9,6 +9,7 @@
 
 #include "SkyMap.hpp"
 
+
 Application::Application(std::string t)
 {
     title = t;
