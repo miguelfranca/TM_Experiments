@@ -28,13 +28,13 @@ class ODEsolver
         setMethod(RK4);
     }
 
-    bool checkData(const VecD &init);
+    bool checkData(const VecD &init) const;
     // dt is changed in RK45, derr is only for RK45
-    VecD step(const VecD &init, double &dt, double derr = 0.);
+    VecD step(const VecD &init, double &dt, double derr = 0.) const;
 
     // returns full history
     // derr is only for RK45
-    MatrixD evolve(const VecD &init, double T, double dt, double derr = 0.);
+    MatrixD evolve(const VecD &init, double T, double dt, double derr = 0.) const;
     MatrixD evolve(ODEmethod met, const VecD &init, double T, double dt,
                    double derr = 0.01)
     {
@@ -42,7 +42,7 @@ class ODEsolver
         return evolve(init, T, dt, derr);
     }
     // returns just last step
-    VecD solve(const VecD &init, double T, double dt, double derr = 0.);
+    VecD solve(const VecD &init, double T, double dt, double derr = 0.) const;
     VecD solve(ODEmethod met, const VecD &init, double T, double dt,
                double derr = 0.01)
     {
@@ -69,13 +69,13 @@ class ODEsolver
     inline void setPointer(void *a_ptr) { ptr = a_ptr; }
 
     // third argument irrelevant, just applicable to RK45
-    VecD stepEuler(const VecD &i, double &dt, double derr = 0.);
-    VecD stepHeun(const VecD &i, double &dt, double derr = 0.);
-    VecD stepRK2(const VecD &i, double &dt, double derr = 0.);
-    VecD stepRK4(const VecD &i, double &dt, double derr = 0.);
-    VecD stepRK45(const VecD &i, double &dt, double derr);
+    VecD stepEuler(const VecD &i, double &dt, double derr = 0.) const;
+    VecD stepHeun(const VecD &i, double &dt, double derr = 0.) const;
+    VecD stepRK2(const VecD &i, double &dt, double derr = 0.) const;
+    VecD stepRK4(const VecD &i, double &dt, double derr = 0.) const;
+    VecD stepRK45(const VecD &i, double &dt, double derr) const;
 
-    bool checkStop(double t, double T, double dt, const VecD &lastX);
+    bool checkStop(double t, double T, double dt, const VecD &lastX) const;
 
   private:
     unsigned dim;
@@ -86,7 +86,7 @@ class ODEsolver
     void *ptr;
 
     typedef VecD (ODEsolver::*mbFunc)(const VecD &init, double &dt,
-                                      double derr);
+                                      double derr) const;
     mbFunc stepFunc;
     ODEmethod method;
 };

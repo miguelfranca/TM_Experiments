@@ -4,6 +4,7 @@
 #include <cassert>
 #include <cmath>
 
+KOKKOS_FUNCTION
 VecD Spacetime::velocity(VecD pos4, VecD vel3, double V) const
 {
     auto g = metric(pos4);
@@ -22,8 +23,12 @@ VecD Spacetime::velocity(VecD pos4, VecD vel3, double V) const
     {
         if (b == 0)
         {
+            #ifdef KOKKOS
+            assert(false);
+            #else
             throw std::runtime_error("[Spacetime::velocity] Something is "
                                      "wrong with your metric... ");
+            #endif
             return VecD();
         }
         v0 = -c / b;
@@ -42,6 +47,7 @@ VecD Spacetime::velocity(VecD pos4, VecD vel3, double V) const
     return {v0, vel3[0], vel3[1], vel3[2]};
 }
 
+KOKKOS_FUNCTION
 MatrixD Flat::metric(const VecD &pos) const
 {
     double r = pos[1];
@@ -57,6 +63,7 @@ MatrixD Flat::metric(const VecD &pos) const
     return g;
 }
 
+KOKKOS_FUNCTION
 MatrixD Flat::imetric(const VecD &pos) const
 {
     double r = pos[1];
@@ -72,6 +79,7 @@ MatrixD Flat::imetric(const VecD &pos) const
     return g;
 }
 
+KOKKOS_FUNCTION
 Vec<MatrixD> Flat::christoffels(const VecD &pos) const
 {
     Vec<MatrixD> chris(4, MatrixD(4, 4, 0.));
@@ -105,8 +113,10 @@ Vec<MatrixD> Flat::christoffels(const VecD &pos) const
     return chris;
 }
 
+KOKKOS_FUNCTION
 Schwarzschild::Schwarzschild(double a_M) : M(a_M) {}
 
+KOKKOS_FUNCTION
 MatrixD Schwarzschild::metric(const VecD &pos) const
 {
     double r = pos[1];
@@ -122,6 +132,7 @@ MatrixD Schwarzschild::metric(const VecD &pos) const
     return g;
 }
 
+KOKKOS_FUNCTION
 MatrixD Schwarzschild::imetric(const VecD &pos) const
 {
     double r = pos[1];
@@ -136,6 +147,7 @@ MatrixD Schwarzschild::imetric(const VecD &pos) const
 
     return g;
 }
+KOKKOS_FUNCTION
 Vec<MatrixD> Schwarzschild::christoffels(const VecD &pos) const
 {
     Vec<MatrixD> chris(4, MatrixD(4, 4, 0.));
@@ -174,17 +186,20 @@ Vec<MatrixD> Schwarzschild::christoffels(const VecD &pos) const
     return chris;
 }
 
+KOKKOS_FUNCTION
 double
 Schwarzschild::BH_radius() const // informs of the radius of an existing BH
 {
     return 2. * M;
 }
 
+KOKKOS_FUNCTION
 Kerr::Kerr(double a_M, double a_a) : M(a_M), a(a_a), a2(a_a * a_a)
 {
     assert(abs(a) <= M);
 }
 
+KOKKOS_FUNCTION
 MatrixD Kerr::metric(const VecD &pos) const
 {
     double r = pos[1];
@@ -212,6 +227,7 @@ MatrixD Kerr::metric(const VecD &pos) const
     return g;
 }
 
+KOKKOS_FUNCTION
 MatrixD Kerr::imetric(const VecD &pos) const
 {
     double r = pos[1];
@@ -238,6 +254,8 @@ MatrixD Kerr::imetric(const VecD &pos) const
 
     return ig;
 }
+
+KOKKOS_FUNCTION
 Vec<MatrixD> Kerr::christoffels(const VecD &pos) const
 {
     Vec<MatrixD> chris(4, MatrixD(4, 4, 0.));
@@ -322,6 +340,7 @@ Vec<MatrixD> Kerr::christoffels(const VecD &pos) const
     return chris;
 }
 
+KOKKOS_FUNCTION
 double Kerr::BH_radius() const // informs of the radius of an existing BH
 {
     return M + sqrt(M * M - a2);

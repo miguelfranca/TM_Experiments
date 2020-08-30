@@ -1,11 +1,22 @@
 #include "Application.h"
 
+#include <Kokkos_Core.hpp>
+
 int main()
 {
-    Application app;
-    app.showFPS(false);
-    app.setMaxFPS(120);
-    app.run();
+#ifdef KOKKOS
+	Kokkos::initialize();
+	{
+#endif
+		Application app;
+		app.showFPS(false);
+		app.setMaxFPS(120);
+		app.run();
 
-    return 0;
+#ifdef KOKKOS
+	}
+	Kokkos::finalize();
+#endif
+
+	return 0;
 }

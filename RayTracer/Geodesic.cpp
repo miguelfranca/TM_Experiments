@@ -14,7 +14,7 @@ Geodesic::Geodesic(const Spacetime &a_st, double vel_squared)
 
 // angles must be sent in radians
 VecD Geodesic::shoot(const VecD &pos3, const VecD &vel3, bool evolveBackwards,
-                     bool showHistory)
+                     bool showHistory) const
 {
     VecD init({0.});
     init.insert(pos3);

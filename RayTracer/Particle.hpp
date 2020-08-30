@@ -5,6 +5,8 @@
 
 #include "Spacetime.hpp"
 
+#include "kokkos_macros.hpp"
+
 class Particle
 {
   public:
@@ -13,7 +15,8 @@ class Particle
 
     void setAngleViews(double horizontal, double vertical);
 
-    Matrix<VecD> view(unsigned points_horizontal);
+    Kokkos::View<double*** >::HostMirror view(unsigned points_horizontal);
+    // Matrix<VecD> view(unsigned points_horizontal);
 
   private:
     const Spacetime &m_st;
@@ -24,10 +27,10 @@ class Particle
 
     double m_angle_H, m_angle_V;
 
-    VecD make_velocity4(double alpha_light, double beta_light,
+    KOKKOS_FUNCTION VecD make_velocity4(double alpha_light, double beta_light,
                         double modV_light);
 
-    double calculate_redshift(const VecD &vel4_ini, const VecD &end);
+    KOKKOS_FUNCTION double calculate_redshift(const VecD &vel4_ini, const VecD &end);
 
     void calculate_tetrad();
     MatrixD m_tetrad;

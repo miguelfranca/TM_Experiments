@@ -41,27 +41,37 @@ VecD SkyMap::getCoordinates(double theta, double phi)
 	return {x, y};
 }
 
-sf::Image SkyMap::getSkyView(const Matrix<VecD>& mat)
+// sf::Image SkyMap::getSkyView(const Matrix<VecD>& mat)
+sf::Image SkyMap::getSkyView(Kokkos::View<double*** >::HostMirror mat)
 {
-	sf::Image view;
-	view.create(mat.getNC(), mat.getNL());
+	unsigned nl = mat.extent_int(0);
+	unsigned nc = mat.extent_int(1);
+	// mat.getNC()
+	// mat.getNL()
 
-	for (unsigned l = 0; l < mat.getNL(); ++l) {
-		for (unsigned c = 0; c < mat.getNC(); ++c) {
-			auto vec = mat[l][c];
+	sf::Image view;
+	view.create(nc, nl);
+
+	for (unsigned c = 0; c < nc; ++c) {
+		for (unsigned l = 0; l < nl; ++l) {
+			// auto vec = mat[l][c];
 			sf::Color color;
-			double r = vec[1];
+			// double r = vec[1];
+			double r = mat(l,c,0);
 
 			if (r < st.BH_radius() || std::isnan(r)) {
 				color = BLACK;
 			}
 			else {
-				double theta = vec[2];
-				double phi = vec[3];
+				// double theta = vec[2];
+				// double phi = vec[3];
+				double theta = mat(l,c,1);
+				double phi = mat(l,c,2);
 
 				VecD coords = getCoordinates(theta, phi);
 				color = getPixelColor(coords[0], coords[1]);
-				color = redshiftColor(color, vec[7]);
+				color = redshiftColor(color, mat(l,c,3));
+				// color = redshiftColor(color, vec[7]);
 			}
 
 			view.setPixel(c, l, color);

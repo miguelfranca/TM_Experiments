@@ -13,19 +13,19 @@
 # 			   ../../GraphicsFramework/GraphicsFramework/holders \
 # 			   ../../GraphicsFramework
 				
-USER_FLAGS  := -std=c++11 -Wno-unused-parameter -Wno-unused-function -fopenmp
+# USER_FLAGS  := -std=c++11 -Wno-unused-parameter -Wno-unused-function -fopenmp
 
 # ROOT_LD 	:= $(shell root-config --libs)
 # ROOT_CXX 	:= $(shell root-config --cflags)
 # SFML_ROOT must be defined on the user's machine
-SFML_LD 	:= -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio -L$(SFML_ROOT)/lib
-SFML_CXX		:= -I$(SFML_ROOT)/include
+# SFML_LD 	:= -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio -L$(SFML_ROOT)/lib
+# SFML_CXX		:= -I$(SFML_ROOT)/include
 
 # VALGRIND	:= -g -O0
-VALGRIND	:= -O2
+VALGRIND	?= -O2
 
-KOKKOS_DEVICES := "Cuda, OpenMP"
-OMP_NUM_THREADS ?= 4
+# KOKKOS_DEVICES := "Cuda, OpenMP"
+# OMP_NUM_THREADS ?= 4
 
 # J = 6 # runs in parallel
 
@@ -63,8 +63,8 @@ MAIN_OBJ_DIR ?= bin
 USER_FLAGS	 += -Wall -Wextra 
 
 MF := Makefile
-ifneq ($(MAIN_DIR),)
-MF += $(MAIN_DIR)/Makefile
+ifneq ($(MAKEFILE_DIR),)
+MF += $(MAKEFILE_DIR)/Makefile
 endif
 
 ##############################################################################################
@@ -146,7 +146,6 @@ ifneq ($(KOKKOS_DEVICES),)
     endif
   endif
 
-
   KOKKOS_AUX_MAKEFILE = Makefile_kokkos_build
   KOKKOS_LIB_FILE = $(BUILD_DIR)/$(KOKKOS_LINK_DEPENDS)
   MF += $(KOKKOS_PATH)/$(KOKKOS_AUX_MAKEFILE)
@@ -174,7 +173,7 @@ $(shell rm -f KokkosCore_config.h KokkosCore_config.tmp)
 
 $(KOKKOS_LIB_FILE):
 	$(ECHO)mkdir -p $(BUILD_DIR)
-	$(ECHO)$(MAKE) -f ../../$(KOKKOS_AUX_MAKEFILE) -C $(BUILD_DIR) --no-print-directory	KOKKOS_DEVICES="$(KOKKOS_DEVICES)" USER_FLAGS="$(USER_FLAGS)"  
+	$(ECHO)$(MAKE) -f ../../$(KOKKOS_AUX_MAKEFILE) -C $(BUILD_DIR) --no-print-directory	KOKKOS_DEVICES=$(KOKKOS_DEVICES) USER_FLAGS="$(USER_FLAGS)"  
 
 clean-kokkos:
 	@echo  cleaning $(RED) Kokkos $(WHITE) for $(PURPLE) $(KOKKOS_DEVICES) $(WHITE)
@@ -185,6 +184,9 @@ endif
 ifneq ($(filter -fopenmp,$(CXX_FLAGS)),)
   export OMP_PROC_BIND=spread
   export OMP_PLACES=threads
+  ifeq ($(OMP_NUM_THREADS),)
+    export OMP_NUM_THREADS=$(NPROCS)
+  endif
 endif
 
 $(EXECUTABLE): $(LIBS_OBJ_FILES) $(MAIN_OBJ_FILES)
@@ -202,7 +204,7 @@ $(MAIN_OBJ_DIR)/%.o: %.cpp $(MF) | $(MAIN_OBJ_DIR)
 define LIBS_OBJ_RULE
 $1/$$(MAIN_OBJ_DIR)/$2.o : $1/$2.cpp $(MF) | $1/$$(MAIN_OBJ_DIR)
 	@echo compiling $$(GREEN) $$(notdir $$@) $$(WHITE) depending $$(YELLOW) $$(notdir $$<) $$(WHITE)
-	$(ECHO)$$(CXX) -o $$@ -c $$< $$(CXX_FLAGS) -MMD -MF $$(subst .o,.d,$@)
+	$(ECHO)$$(CXX) -o $$@ -c $$< $$(CXX_FLAGS) -MMD -MF $$(subst .o,.d,$$@)
 endef
 
 # function that removes the 'bin' part and the file name from a path

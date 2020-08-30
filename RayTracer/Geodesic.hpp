@@ -16,7 +16,7 @@ class Geodesic
 
     // angles must be sent in radians
     VecD shoot(const VecD &pos3, const VecD &vel3, bool evolveBackwards = false,
-               bool showHistory = false);
+               bool showHistory = false) const;
 
     const Spacetime &st;
     const double V2; // -1 for massive particles, 0 for null rays

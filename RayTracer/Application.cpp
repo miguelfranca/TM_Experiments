@@ -45,7 +45,8 @@ bool Application::onHandleEvent(GF::Event &event)
     // if(pan >= 2. * M_PI)
     // return false;
     if (pan > 0.)
-        return true;
+        return false;
+        // return true;
 
     // Flat st;
 
@@ -80,8 +81,10 @@ bool Application::onHandleEvent(GF::Event &event)
     sprt.setTexture(txt, true);
     sprt.setPosition(0, 0);
 
-    double sx = ((double)SCREENWIDTH) / mat.getNC();
-    double sy = ((double)SCREENHEIGHT) / mat.getNL();
+    unsigned nl = mat.extent_int(0);
+    unsigned nc = mat.extent_int(1);
+    double sx = ((double)SCREENWIDTH) / nc;
+    double sy = ((double)SCREENHEIGHT) / nl;
 
     sx = std::min(sx, sy);
     sprt.scale(sx, sx);

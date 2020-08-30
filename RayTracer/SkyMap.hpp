@@ -6,6 +6,7 @@
 #include "Matrix.hpp"
 #include "Tools.hpp"
 
+#include <Kokkos_Core.hpp>
 
 class SkyMap
 {
@@ -14,7 +15,8 @@ public:
 
     virtual sf::Color getPixelColor(double x, double y) = 0;
 
-    sf::Image getSkyView(const Matrix<VecD>& mat);
+    // sf::Image getSkyView(const Matrix<VecD>& mat);
+    sf::Image getSkyView(Kokkos::View<double*** >::HostMirror mat);
 
     VecD getCoordinates(double theta, double phi);
 

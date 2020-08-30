@@ -4,8 +4,8 @@
 
 #include "ProgressBar.hpp"
 
-Particle::Particle(const Spacetime &a_st, const VecD &a_pos3,
-                   const VecD &a_vel3, double a_alpha, double a_beta,
+Particle::Particle(const Spacetime& a_st, const VecD& a_pos3,
+                   const VecD& a_vel3, double a_alpha, double a_beta,
                    double vel_squared)
     : m_st(a_st), m_pos3(a_pos3), m_vel3(a_vel3), m_alpha(a_alpha),
       m_beta(a_beta), m_V2(vel_squared), m_angle_H(M_PI / 4.),
@@ -26,7 +26,7 @@ void Particle::setAngleViews(double horizontal, double vertical)
 void Particle::calculate_tetrad()
 {
     auto g = m_st.metric(m_pos4);
-    const VecD &et = m_vel4;
+    const VecD& et = m_vel4;
     VecD et_down = g.prod(et);
 
     VecD vr = {0., 1., 0., 0.};
@@ -74,48 +74,79 @@ void Particle::calculate_tetrad()
     */
 }
 
-Matrix<VecD> Particle::view(unsigned points_horizontal)
+// Matrix<VecD>
+Kokkos::View<double*** >::HostMirror Particle::view(unsigned points_horizontal)
 {
     // shoot light rays
-    Geodesic geo(m_st, 0); // -1 for particles, 0 for light
+    const Geodesic geo(m_st, 0); // -1 for particles, 0 for light
 
     unsigned points_vertical =
         std::round(points_horizontal * m_angle_V / m_angle_H);
     points_vertical = std::max((unsigned)2, points_vertical);
 
-    Matrix<VecD> mat(points_vertical, points_horizontal, VecD());
+    // Matrix<VecD> mat(points_vertical, points_horizontal, VecD());
 
-    ProgressBar pb(points_vertical);
+    // time + 3-position + 3-velocity + redshift -> we need (radius, theta, phi, redshift)
+    Kokkos::View<double*** > mat_device("mat_device", points_vertical, points_horizontal, 4);
+
+    // ProgressBar pb(points_vertical);
 
     double dV = 2. * m_angle_V / (points_vertical - 1);
     double dH = 2. * m_angle_H / (points_horizontal - 1);
+    /*
+        #pragma omp parallel for default(none)                                         \
+            shared(pb, points_vertical, points_horizontal, geo, mat, dV, dH)
+            for (unsigned l = 0; l < points_vertical; ++l)
+            {
+                for (unsigned c = 0; c < points_horizontal; ++c)
+                {
+                    double alpha_light = m_angle_V - l * dV;
+                    double beta_light = -m_angle_H + c * dH;
 
-#pragma omp parallel for default(none)                                         \
-    shared(pb, points_vertical, points_horizontal, geo, mat, dV, dH)
-    for (unsigned l = 0; l < points_vertical; ++l)
-    {
-        for (unsigned c = 0; c < points_horizontal; ++c)
-        {
-            double alpha_light = m_angle_V - l * dV;
-            double beta_light = -m_angle_H + c * dH;
+                    VecD vel4 = make_velocity4(alpha_light, beta_light, 1.);
+                    VecD vel3 = {vel4[1], vel4[2], vel4[3]};
 
-            VecD vel4 = make_velocity4(alpha_light, beta_light, 1.);
-            VecD vel3 = {vel4[1], vel4[2], vel4[3]};
+                    VecD end_point = geo.shoot(m_pos3, vel3, true);
+                    // VecD end_point = geo.shoot(pos3, vel3, true, true);
+                    double redshift = calculate_redshift(vel4, end_point);
+                    end_point.push_back(redshift);
 
-            VecD end_point = geo.shoot(m_pos3, vel3, true);
-            // VecD end_point = geo.shoot(pos3, vel3, true, true);
-            double redshift = calculate_redshift(vel4, end_point);
-            end_point.push_back(redshift);
+                    mat[l][c] = end_point;
+                }
+                // ++pb;
+            }
+    */
+   
+    Kokkos::parallel_for(Kokkos::MDRangePolicy<Kokkos::Rank<2>>
+                         ({0, 0}, { points_vertical, points_horizontal}),
+    KOKKOS_LAMBDA(int l, int c) {
+        double alpha_light = m_angle_V - l * dV;
+        double beta_light = -m_angle_H + c * dH;
 
-            mat[l][c] = end_point;
-        }
-        ++pb;
+        VecD vel4 = make_velocity4(alpha_light, beta_light, 1.);
+        VecD vel3 = {vel4[1], vel4[2], vel4[3]};
+
+        VecD end_point = geo.shoot(m_pos3, vel3, true);
+        // VecD end_point = geo.shoot(pos3, vel3, true, true);
+        double redshift = calculate_redshift(vel4, end_point);
+
+        mat_device(l, c, 0) = end_point[1];
+        mat_device(l, c, 1) = end_point[2];
+        mat_device(l, c, 2) = end_point[3];
+        mat_device(l, c, 3) = redshift;
     }
+                        );
+    // ++pb;
+    //
+    Kokkos::View<double*** >::HostMirror mat_host = Kokkos::create_mirror_view(mat_device);
+    Kokkos::deep_copy(mat_host, mat_device);
 
-    return mat;
+
+    // return Matrix<VecD>(points_vertical, points_horizontal, VecD(8));
+    return mat_host;
 }
 
-VecD Particle::make_velocity4(double alpha_light, double beta_light,
+KOKKOS_FUNCTION VecD Particle::make_velocity4(double alpha_light, double beta_light,
                               double modV_light)
 {
     // alpha_light and beta_light: light angles from user reference point
@@ -138,7 +169,8 @@ VecD Particle::make_velocity4(double alpha_light, double beta_light,
                       cosal * cosb * sinbl;
 
     VecD vel3_rot = {modV_light * vr_rot, modV_light * vtheta_rot,
-                     modV_light * vphi_rot};
+                     modV_light* vphi_rot
+                    };
     // vel3_rot.print();
 
     // std::cout << std::endl;
@@ -183,17 +215,16 @@ VecD Particle::make_velocity4(double alpha_light, double beta_light,
     // vel4.print();
     // st.velocity(pos4, vel3, 0).print();
     // std::cout << std::endl;
-    if (vel4.norm() == 0. /* they are all 0*/)
-    {
+    if (vel4.norm() == 0. /* they are all 0*/) {
         throw std::runtime_error(
             "3 velocity invalid for position and particle type chosen.");
         return vel4;
     }
+
     // geodesic invalid (probably inside BH in an orbit that is invalid, for
     // example too big angles, just let it be and assume it collides to
     // singularity)
-    if (std::isnan(vel4[0]))
-    {
+    if (std::isnan(vel4[0])) {
         throw std::runtime_error("Check me.");
         return vel4;
     }
@@ -201,7 +232,7 @@ VecD Particle::make_velocity4(double alpha_light, double beta_light,
     return vel4;
 }
 
-double Particle::calculate_redshift(const VecD &vel4_init, const VecD &end)
+KOKKOS_FUNCTION double Particle::calculate_redshift(const VecD& vel4_init, const VecD& end)
 {
     auto g_init = m_st.metric(m_pos4);
 

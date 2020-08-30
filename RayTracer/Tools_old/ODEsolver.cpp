@@ -3,11 +3,11 @@
 #include <cmath>
 #include <iostream>
 
-bool ODEsolver::checkData(const VecD &init)
+bool ODEsolver::checkData(const VecD &init) const
 {
     return ((unsigned)init.size() - 1) == dim;
 }
-bool ODEsolver::checkStop(double t, double T, double dt, const VecD &lastX)
+bool ODEsolver::checkStop(double t, double T, double dt, const VecD &lastX) const
 {
     bool good;
     if (stopCriteria == nullptr)
@@ -46,12 +46,12 @@ void ODEsolver::setMethod(ODEmethod met)
     }
 }
 
-VecD ODEsolver::step(const VecD &init, double &dt, double derr)
+VecD ODEsolver::step(const VecD &init, double &dt, double derr) const
 {
     return (this->*stepFunc)(init, dt, derr);
 }
 
-MatrixD ODEsolver::evolve(const VecD &init, double T, double dt, double derr)
+MatrixD ODEsolver::evolve(const VecD &init, double T, double dt, double derr) const
 {
     if (!checkData(init))
     {
@@ -87,7 +87,7 @@ MatrixD ODEsolver::evolve(const VecD &init, double T, double dt, double derr)
 
     return m;
 }
-VecD ODEsolver::solve(const VecD &init, double T, double dt, double derr)
+VecD ODEsolver::solve(const VecD &init, double T, double dt, double derr) const
 {
     if (!checkData(init))
     {
@@ -116,7 +116,7 @@ VecD ODEsolver::solve(const VecD &init, double T, double dt, double derr)
     return v;
 }
 
-VecD ODEsolver::stepEuler(const VecD &init, double &dt, double)
+VecD ODEsolver::stepEuler(const VecD &init, double &dt, double) const
 {
     // y_j+1 = y_j + h*F(y_j)
     VecD ponto = init + dt * RHS(init, params, ptr);
@@ -124,7 +124,7 @@ VecD ODEsolver::stepEuler(const VecD &init, double &dt, double)
     return ponto;
 }
 
-VecD ODEsolver::stepHeun(const VecD &init, double &dt, double)
+VecD ODEsolver::stepHeun(const VecD &init, double &dt, double) const
 {
     // temp = y_j + h*F(y_j)
     VecD ponto = init + dt * RHS(init, params, ptr);
@@ -138,7 +138,7 @@ VecD ODEsolver::stepHeun(const VecD &init, double &dt, double)
     return ponto2;
 }
 
-VecD ODEsolver::stepRK2(const VecD &init, double &dt, double)
+VecD ODEsolver::stepRK2(const VecD &init, double &dt, double) const
 {
     // temp = y_j + h/2*F(y_j)
     VecD K1 = init + dt / 2. * RHS(init, params, ptr);
@@ -152,7 +152,7 @@ VecD ODEsolver::stepRK2(const VecD &init, double &dt, double)
     return ponto;
 }
 
-VecD ODEsolver::stepRK4(const VecD &init, double &dt, double)
+VecD ODEsolver::stepRK4(const VecD &init, double &dt, double) const
 {
     // K1 = h*F(y_j)
     VecD K1 = dt * RHS(init, params, ptr);
@@ -177,7 +177,7 @@ VecD ODEsolver::stepRK4(const VecD &init, double &dt, double)
     return ponto;
 }
 
-VecD ODEsolver::stepRK45(const VecD &init, double &step, double derr)
+VecD ODEsolver::stepRK45(const VecD &init, double &step, double derr) const
 {
 
     static const double B[] = {0.2,
