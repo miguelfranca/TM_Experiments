@@ -1,7 +1,12 @@
 #include "CarAI.h"
 
 CarAI::CarAI(std::string t) : ga("params.txt"), image(nullptr), lastFitness(0.), AI(nullptr),
-	pause(false) { title = t; }
+	pause(false)
+{
+	setupWindow(CENTER_SCREEN.x * 1.5, CENTER_SCREEN.y * 1.5, (CENTER_SCREEN.x * 1.5 - CENTER_SCREEN.x) / 2, (CENTER_SCREEN.y * 1.5 - CENTER_SCREEN.y) / 2,
+			            sf::Style::Default);
+	title = t;
+}
 
 // called once before the game starts
 bool CarAI::onCreate()
