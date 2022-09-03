@@ -56,7 +56,8 @@ bool SurvivalGame::onCreate()
 	return true;
 }
 
-bool SurvivalGame::step(GameEntities& enti, bool mousePressed, float mousePosX, float mousePosY,
+bool SurvivalGame::step(GameEntities& enti, bool mousePressed, float mousePosX,
+                        float mousePosY,
                         float horizontalMovement, float verticalMovement, int buttonUpgrade, float elapsedTime)
 {
 	enti.botPeriod += elapsedTime;
@@ -73,10 +74,12 @@ bool SurvivalGame::step(GameEntities& enti, bool mousePressed, float mousePosX, 
 		enti.shotsPeriod = 0;
 	}
 
-	if (!(((enti.player.getX() < (enti.player.getSize().x / 2) + boundary_x) && horizontalMovement < 0.)
+	if (!(((enti.player.getX() < (enti.player.getSize().x / 2) + boundary_x)
+	       && horizontalMovement < 0.)
 	      || ((enti.player.getX() > SCREENWIDTH - enti.player.getSize().x / 2 - boundary_x)
 	          && horizontalMovement > 0.)
-	      || ((enti.player.getY() < (enti.player.getSize().y / 2) + boundary_y) && verticalMovement < 0.)
+	      || ((enti.player.getY() < (enti.player.getSize().y / 2) + boundary_y)
+	          && verticalMovement < 0.)
 	      || ((enti.player.getY() > SCREENHEIGHT - enti.player.getSize().y / 2 - boundary_x)
 	          && verticalMovement > 0.))) {
 
@@ -113,27 +116,30 @@ bool SurvivalGame::onHandleEvent(GF::Event& event)
 	static GF::ToggleKey SPACE(sf::Keyboard::Space);
 	static GF::ToggleKey E(sf::Keyboard::E);
 
-	if (SPACE.isKeyReleasedOnce(event))
-		paused = !paused;
+	do {
+		if (SPACE.isKeyReleasedOnce(event))
+			paused = !paused;
 
-	button_pressed = -1;
+		button_pressed = -1;
 
-	if (GF::Mouse::Left.clicked(event)) {
-		for (unsigned i = 0; i < buttons_number; ++i) {
-			if (button[i].isClicked(GF::Mouse::getPosition(window).x, GF::Mouse::getPosition(window).y))
-				button_pressed = i;
-		}
-	}
-
-	if (E.isKeyReleasedOnce(event)) {
-		if (bestState == nullptr) {
-			bestState = new SBestReplay(&states, &window);
-			bestState->setMaxFPS(getMaxFPS());
+		if (GF::Mouse::Left.clicked(event)) {
+			for (unsigned i = 0; i < buttons_number; ++i) {
+				if (button[i].isClicked(GF::Mouse::getPosition(window).x,
+				                        GF::Mouse::getPosition(window).y))
+					button_pressed = i;
+			}
 		}
 
-		states.change("Evolution", bestState);
-	}
+		if (E.isKeyReleasedOnce(event)) {
+			if (bestState == nullptr) {
+				bestState = new SBestReplay(&states, &window);
+				bestState->setMaxFPS(getMaxFPS());
+			}
 
+			states.change("Evolution", bestState);
+		}
+
+	} while (window.pollEvent(event));
 
 	return true;
 }
@@ -151,7 +157,8 @@ bool SurvivalGame::onUpdate(const float fElapsedTime, const float fTotalTime)
 		mouseY = GF::Mouse::getPosition(window).y;
 	}
 
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::A) || sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)
+	    || sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
 		velX = -1.;
 		velY = 0.;
 	}
@@ -162,19 +169,22 @@ bool SurvivalGame::onUpdate(const float fElapsedTime, const float fTotalTime)
 		velY = 0.;
 	}
 
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::W) || sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) {
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)
+	    || sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) {
 		velX = 0.;
 		velY = -1.;
 	}
 
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::S) || sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)
+	    || sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
 		velX = 0.;
 		velY = 1.;
 	}
 
 	if (paused)
 		step(game, false, 0., 0., 0., 0., button_pressed, 0.);
-	else if (step(game, mousePressed, mouseX, mouseY, velX, velY, button_pressed, fElapsedTime))
+	else if (step(game, mousePressed, mouseX, mouseY, velX, velY, button_pressed,
+	              fElapsedTime))
 		bullet_sound.play();
 
 
