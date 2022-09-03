@@ -59,8 +59,8 @@ bool Application::onHandleEvent(GF::Event &event)
 
     // VecD position({10., M_PI / 2., pan});
     VecD position({10., M_PI / 2., 0.});
-    VecD velocity({0., 0.0, 0.01});
-    double alpha = 0. / 180. * M_PI;
+    VecD velocity({0., 0.0, 0.0});
+    double alpha = 180. / 180. * M_PI;
     double beta = 0. / 180. * M_PI;
 
     Particle par(st, position, velocity, alpha, beta, -1.);
@@ -68,8 +68,8 @@ bool Application::onHandleEvent(GF::Event &event)
     auto mat = par.view(200);
     // mat.print();
 
-    //ImageSkyMap sky(st, "res/images/stars_3.jpg", false);
-    ColorSkyMap sky(st, false, M_PI / 18., M_PI / 180. / 5.);
+    ImageSkyMap sky(st, "res/images/stars_3.jpg", false);
+    //ColorSkyMap sky(st, false, M_PI / 18., M_PI / 180. / 5.);
 
     sf::Image view = sky.getSkyView(mat);
 
