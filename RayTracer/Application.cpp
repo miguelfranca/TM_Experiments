@@ -67,8 +67,8 @@ bool Application::onHandleEvent(GF::Event &event)
     auto mat = par.view(200);
     // mat.print();
 
-    ImageSkyMap sky(st, "res/images/stars_3.jpg", false);
-    // ColorSkyMap sky(st, false, M_PI / 18., M_PI / 180. / 5.);
+    //ImageSkyMap sky(st, "res/images/stars_3.jpg", false);
+    ColorSkyMap sky(st, false, M_PI / 18., M_PI / 180. / 5.);
 
     sf::Image view = sky.getSkyView(mat);
 
@@ -88,7 +88,7 @@ bool Application::onHandleEvent(GF::Event &event)
 
     window.draw(sprt);
 
-    view.saveToFile("screenshot" + std::to_string(time(NULL)) + ".png");
+    view.saveToFile("tmp/screenshot" + std::to_string(time(NULL)) + ".png");
     // char buffer[30];
     // sprintf(buffer, "walk_around_%05d.png",
     //         (int)std::round(pan * 180. / M_PI * 100));
